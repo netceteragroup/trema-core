@@ -1,4 +1,0 @@
-trema-core
-==========
-
-Trema foundation

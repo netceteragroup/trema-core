@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:element name="trema">
+    <xs:complexType>
+      <xs:sequence>        
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="text">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="context" minOccurs="1" maxOccurs="1" type="xs:string"/>
+              <xs:element name="value" minOccurs="1" maxOccurs="unbounded">
+                <xs:complexType mixed="true">
+                  <xs:attribute name="lang" use="required" type="xs:NCName"/>
+                  <xs:attribute name="status" use="required">
+                    <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                      <xs:enumeration value="initial" />
+                      <xs:enumeration value="translated" />
+                      <xs:enumeration value="verified" />
+                      <xs:enumeration value="special" />
+                    </xs:restriction>
+                  </xs:simpleType>
+                  </xs:attribute>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:attribute name="key" use="required"/>
+          </xs:complexType>
+          <!-- different values in a text cannot have the same language -->
+          <xs:unique name="langsAreUniqueInAText">
+            <xs:selector xpath="value"/>
+            <xs:field xpath="@lang"/>
+          </xs:unique>
+        </xs:element>  
+      </xs:sequence>
+      <xs:attribute name="masterLang" use="required" type="xs:NCName"/>
+    </xs:complexType>
+    <!-- same key is not allowed in twice in a trema file -->
+    <xs:unique name="textKeysAreUnique">
+      <xs:selector xpath="text"/>
+      <xs:field xpath="@key"/>
+    </xs:unique>
+  </xs:element>  
+</xs:schema>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- test Trema XML document -->
+<trema masterLang="jp">
+  <text key="testKey">
+    <context>context</context>
+    <value lang="jp" status="translated">バナナöäü</value>
+  </text>
+</trema>
