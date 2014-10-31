@@ -3,6 +3,7 @@ package com.netcetera.trema.core.exporting;
 import com.netcetera.trema.core.Status;
 import com.netcetera.trema.core.api.ITextNode;
 
+import java.io.IOException;
 
 
 /**
@@ -23,7 +24,7 @@ public class CSVExporter extends AbstractSpreadSheetExporter {
   }
 
   /**
-   * For unitesting only constructor.
+   * For unit esting only constructor.
    */
   protected CSVExporter() {
 
@@ -33,7 +34,11 @@ public class CSVExporter extends AbstractSpreadSheetExporter {
   @Override
   public void export(ITextNode[] nodes, String masterlanguage, String language, Status[] states) {
     String[][] values = getValues(nodes, masterlanguage, language, states);
-    printer.println(values);
+    try {
+      printer.print(values);
+    } catch (IOException e) {
+      throw new IllegalStateException(e);
+    }
   }
 
 }

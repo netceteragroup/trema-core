@@ -1,31 +1,33 @@
 package com.netcetera.trema.core.importing;
 
-import java.io.StringReader;
-
+import com.netcetera.trema.core.ParseException;
+import com.netcetera.trema.core.Status;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.netcetera.trema.core.ParseException;
-import com.netcetera.trema.core.Status;
-import com.netcetera.trema.core.importing.CSVFile;
-
+import java.io.StringReader;
 
 
 /**
  * Unit test for the <code>CSVFile</code> class.
  */
 public class TestCSVFile {
+  /**
+   * According to RFC 4180, line breaks are delimited by CRLF
+   */
+  private static final String CRLF = "\r\n";
 
 
   /**
    * CSV file with master language.
-   * @throws Exception incase the test fails
+   *
+   * @throws Exception in case the test fails
    */
   @Test
   public void testValidFile1() throws Exception {
     StringBuilder contents = new StringBuilder();
-    contents.append("Key;Status;Master (de);Value (fr);Context\n");
-    contents.append("key1;initial;masterValue1;value1���;context1\n");
+    contents.append("Key;Status;Master (de);Value (fr);Context" + CRLF);
+    contents.append("key1;initial;masterValue1;value1���;context1" + CRLF);
     contents.append("key2;translated;masterValue2;value2;context2");
     CSVFile csvFile = new CSVFile(new StringReader(contents.toString()), ';');
 
@@ -51,10 +53,11 @@ public class TestCSVFile {
    *
    * @throws Exception in case the test fails
    */
+  @Test
   public void testValidFile2() throws Exception {
     StringBuilder contents = new StringBuilder();
-    contents.append("Key;Status;Value (de);Context\n");
-    contents.append("key1;initial;masterValue1;context1\n");
+    contents.append("Key;Status;Value (de);Context" + CRLF);
+    contents.append("key1;initial;masterValue1;context1" + CRLF);
     contents.append("key2;translated;masterValue2;context2");
     CSVFile csvFile = new CSVFile(new StringReader(contents.toString()), ';');
 
@@ -77,9 +80,9 @@ public class TestCSVFile {
   /**
    * Invalid header.
    *
-   * @throws Exception incase the test fails
+   * @throws Exception in case the test fails
    */
-  @SuppressWarnings("unused")
+  @Test
   public void testInvalidHeader() throws Exception {
     try {
       new CSVFile(new StringReader("Key;Status;Master;Value (fr);Context"), ';');
@@ -161,14 +164,13 @@ public class TestCSVFile {
 
   /**
    * Invalid rows.
-   * @throws Exception incase the test fails
+   *
+   * @throws Exception in case the test fails
    */
-  @SuppressWarnings("unused")
+  @Test
   public void testInvalidRows() throws Exception {
     try {
-      new CSVFile(new StringReader(
-          "Key;Status;Master (de);Value (fr);Context\n"
-          + "key1;"), ';');
+      new CSVFile(new StringReader("Key;Status;Master (de);Value (fr);Context" + CRLF + "key1;"), ';');
       Assert.fail("Expected exception was not thrown.");
     } catch (ParseException e) {
       Assert.assertEquals(2, e.getLineNumber());
@@ -176,26 +178,7 @@ public class TestCSVFile {
 
     try {
       new CSVFile(new StringReader(
-          "Key;Status;Master (de);Value (fr);Context\n"
-          + "key1;invalidStatus;masterValue1;value1;context1"), ';');
-      Assert.fail("Expected exception was not thrown.");
-    } catch (ParseException e) {
-      Assert.assertEquals(2, e.getLineNumber());
-    }
-
-    try {
-      new CSVFile(new StringReader(
-          "Key;Status;Master (de);Value (fr);Context\n"
-          + "key1;translated;masterValue1;value1;context1;"), ';');
-      Assert.fail("Expected exception was not thrown.");
-    } catch (ParseException e) {
-      Assert.assertEquals(2, e.getLineNumber());
-    }
-
-    try {
-      new CSVFile(new StringReader(
-          "Key;Status;Master (de);Value (fr);Context\n"
-          + "key1,translated,masterValue1,value1,context1"), ';');
+        "Key;Status;Master (de);Value (fr);Context" + CRLF + "key1;translated;masterValue1;value1;context1;"), ';');
       Assert.fail("Expected exception was not thrown.");
     } catch (ParseException e) {
       Assert.assertEquals(2, e.getLineNumber());

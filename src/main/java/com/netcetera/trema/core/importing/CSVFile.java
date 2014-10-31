@@ -6,28 +6,27 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
-
+import java.util.List;
 import com.netcetera.trema.core.ParseException;
 import com.netcetera.trema.core.Status;
 
-import ch.netcetera.wake.core.format.csv.CSVParser;
-
-
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 
 /**
  * Represents a CSV text resource file.
  */
 public class CSVFile extends AbstractFile {
-  
+
   /** Error message if a wrong header format is encountered. */
   private static final String WRONG_HEADER_ERROR_MESSAGE =
     "Expected header format: Key;Status;[Master (<language>);]Value (<language>);Context";
-  
+
   private String pathName = null;
   private String masterLanguage = null;
   private String language = null;
-  
-  
+
   /**
    * For unit test purposes.
    * @param masterLanguage the masterLanguage
@@ -37,7 +36,7 @@ public class CSVFile extends AbstractFile {
     this.masterLanguage = masterLanguage;
     this.language = language;
   }
-  
+
   /**
    * Constructs a new CSV file from a path name.
    * @param pathName the path
@@ -46,19 +45,15 @@ public class CSVFile extends AbstractFile {
    * @throws ParseException if any parse errors ocur
    * @throws UnsupportedEncodingException if the given encoding is not
    * supported
-   * @throws IOException if any IO errors occur
+   * @throws IOException if any I/O errors occur
    */
-  public CSVFile(String pathName, String encoding, char separator)
-  throws ParseException, UnsupportedEncodingException, IOException {
+  public CSVFile(String pathName, String encoding, char separator) throws ParseException, IOException {
     this.pathName = pathName;
-    Reader reader = new InputStreamReader(new FileInputStream(pathName), encoding);
-    try {
+    try (Reader reader = new InputStreamReader(new FileInputStream(pathName), encoding)) {
       parse(reader, separator);
-    } finally {
-      reader.close();
     }
   }
-  
+
   /**
    * Constructs a new CSV file from a string reader.
    * @param stringReader the string reader to read from
@@ -69,7 +64,7 @@ public class CSVFile extends AbstractFile {
   public CSVFile(StringReader stringReader, char separator) throws ParseException, IOException {
     parse(stringReader, separator);
   }
-  
+
   /**
    * Parses a CSV file from a given reader.
    * @param reader the reader
@@ -78,84 +73,98 @@ public class CSVFile extends AbstractFile {
    * @throws IOException if any IO errors occur
    */
   private void parse(Reader reader, char separator) throws IOException, ParseException {
-    CSVParser csvParser = new CSVParser(reader, separator);
-    csvParser.setIgnoreEmptyLines(true);
-    csvParser.setIgnoreLeadingWhitespaces(true);
-    
-    String[][] allValues = csvParser.getAllValues();
-    if (allValues != null && allValues.length > 0) {
-      String[] headerRow = allValues[0];
-      int currentColumn = -1;
-      
-      // key
-      if (headerRow.length < 4 || !headerRow[++currentColumn].equalsIgnoreCase(AbstractFile.KEY_HEADER)) {
-        throw new ParseException(WRONG_HEADER_ERROR_MESSAGE, 1);
+    /*
+     * Ideally one would configure the format using withHeader(String ...) but since the master column is optional
+     * this is of no use. Therefore, you'll get null if you were to call getHeaderMap() later on the parser. The header
+     * is returned as the 1st record (i.e. row).
+     */
+    CSVParser csvParser = CSVFormat.DEFAULT.withDelimiter(separator).withIgnoreSurroundingSpaces(true).parse(reader);
+
+    List<CSVRecord> records = csvParser.getRecords();
+
+    String[] header = transformHeaderMapToArray(records.get(0));
+    verifyHeader(header);
+
+    for (int i = 1; i < records.size(); i++) {
+      CSVRecord csvRecord = records.get(i);
+
+      if (csvRecord.size() != header.length) {
+        throw new ParseException(String.format("Expected %d columns but got %d.",  header.length, csvRecord.size()),
+          i + 1);
       }
-      
-      // status
-      if (!headerRow[++currentColumn].equalsIgnoreCase(AbstractFile.STATUS_HEADER)) {
-        throw new ParseException(WRONG_HEADER_ERROR_MESSAGE, 1);
-      }
-      
-      // master
-      if (startsWithIgnoreCase(headerRow[++currentColumn], AbstractFile.MASTER_HEADER)) {
-        masterLanguage = extractLanguage(headerRow[currentColumn]);
+      String key = csvRecord.get(0);
+      Status status = Status.valueOf(csvRecord.get(1));
+      String masterValue = null;
+      String value;
+      if (hasMasterLanguage()) {
+        masterValue = csvRecord.get(2);
+        value = csvRecord.get(3);
       } else {
-        currentColumn--;
+        value = csvRecord.get(2);
       }
-      
-      // value
-      if (startsWithIgnoreCase(headerRow[++currentColumn], AbstractFile.VALUE_HEADER)) {
-        language = extractLanguage(headerRow[currentColumn]);        
-        if (language.equals(masterLanguage)) {
-          throw new ParseException("The master language cannot be the same as the exported langugae.", 1);
-        }
-      } else {
-        throw new ParseException(WRONG_HEADER_ERROR_MESSAGE, 1);
+
+      // the context is irrelevant, so it is not added
+      add(key, status, masterValue, value);
+    }
+  }
+
+  private String[] transformHeaderMapToArray(CSVRecord headerRecord) {
+    String[] header = new String[headerRecord.size()];
+    for (int i = 0; i < headerRecord.size(); i++) {
+      header[i] = headerRecord.get(i);
+    }
+    return header;
+  }
+
+  private void verifyHeader(String[] header) throws ParseException {
+    if (header == null || header.length == 0) {
+      throwWrongHeaderException();
+    } else {
+      verifyHeaderSize(header);
+      verifyHeaderColumn(header, 0, AbstractFile.KEY_HEADER);
+      verifyHeaderColumn(header, 1, AbstractFile.STATUS_HEADER);
+      boolean masterHeaderPresent = hasHeaderColumnStartingWith(header, 2, AbstractFile.MASTER_HEADER);
+      verifyHeaderColumnStartsWith(header, masterHeaderPresent ? 3 : 2, AbstractFile.VALUE_HEADER);
+      verifyHeaderColumn(header, masterHeaderPresent ? 4 : 3, AbstractFile.CONTEXT_HEADER);
+      if (masterHeaderPresent) {
+        masterLanguage = extractLanguage(header[2]);
       }
-      
-      // context
-      if (!headerRow[++currentColumn].equalsIgnoreCase(AbstractFile.CONTEXT_HEADER)) {
-        throw new ParseException(WRONG_HEADER_ERROR_MESSAGE, 1);
-      }
-      
-      // loop over the keys
-      int numberOfColumns = currentColumn + 1;
-      for (int i = 1; i < allValues.length; i++) {
-        String[] row = allValues[i];
-        
-        if (row.length == 1 && row[0].length() == 0) {
-          // even though csvParser.setIgnoreEmptyLines(true) was stated, the CSV parser
-          // does not ignore trailing empty lines
-          continue;
-        }
-        
-        if (row.length != numberOfColumns) {
-          throw new ParseException("Expected " + numberOfColumns + " columns, but got " + row.length + ".", i + 1);
-        }
-        currentColumn = 0;
-        String key = row[currentColumn++];
-        String statusName = row[currentColumn++];
-        Status status = Status.valueOf(statusName);
-        if (status == null) {
-          throw new ParseException("Invalid status: " + statusName, i + 1);
-        }
-        String masterValue = null;
-        if (hasMasterLanguage()) {
-          masterValue = row[currentColumn++];
-        }
-        String value = row[currentColumn++];
-        
-        // the context is irrelevant, so it is not added
-        add(key, status, masterValue, value);
+      language = extractLanguage(header[masterHeaderPresent ? 3 : 2]);
+      if (language.equals(masterLanguage)) {
+        throw new ParseException("The master language cannot be the same as the exported language.", 1);
       }
     }
   }
-  
-  private boolean startsWithIgnoreCase(String string, String prefix) {
-    return string.toLowerCase().startsWith(prefix.toLowerCase());
+
+  private void verifyHeaderColumnStartsWith(String[] header, int index, String expectedHaderNamePrefix) throws ParseException {
+    if (!hasHeaderColumnStartingWith(header, index, expectedHaderNamePrefix)) {
+      throwWrongHeaderException();
+    }
   }
-  
+
+  private boolean hasHeaderColumnStartingWith(String[] header, int index, String expectedHeaderNamePrefix) {
+    String headerName = header[index];
+    return headerName != null && headerName.startsWith(expectedHeaderNamePrefix);
+  }
+
+  private void verifyHeaderColumn(String[] header, int index, String expectedHeaderName) throws ParseException {
+    String headerName = header[index];
+    if (headerName == null || !headerName.equals(expectedHeaderName)) {
+      throwWrongHeaderException();
+    }
+  }
+
+  private void verifyHeaderSize(String[] headerMap) throws ParseException {
+    // header's got 4 or 5 elements (master lang is optional)
+    if (headerMap.length < 4) {
+      throwWrongHeaderException();
+    }
+  }
+
+  private void throwWrongHeaderException() throws ParseException {
+    throw new ParseException(WRONG_HEADER_ERROR_MESSAGE, 1);
+  }
+
   /**
    * Extracts the language of the "master language value" and "value"
    * column heading in the first line of the trema CSV file.
@@ -167,15 +176,15 @@ public class CSVFile extends AbstractFile {
   private String extractLanguage(String columnHeading) throws ParseException {
     int start = columnHeading.indexOf('(');
     int end = columnHeading.indexOf(')');
-    
+
     if (start == -1 || end == -1 || start >= end) {
-      throw new ParseException(WRONG_HEADER_ERROR_MESSAGE, 1);
+      throwWrongHeaderException();
     }
     return columnHeading.substring(start + 1, end);
   }
-  
-  
-  
+
+
+
   /**
    * Gets the pathname of this CSV file.
    * @return the pathname of this CSV file.
@@ -183,13 +192,13 @@ public class CSVFile extends AbstractFile {
   public String getPathname() {
     return pathName;
   }
-  
+
   /** {@inheritDoc} */
   @Override
   public boolean hasMasterLanguage() {
     return masterLanguage != null;
   }
-  
+
   /** {@inheritDoc} */
   @Override
   public String getLanguage() {
@@ -203,5 +212,5 @@ public class CSVFile extends AbstractFile {
   public String getMasterLanguage() {
     return masterLanguage;
   }
-  
+
 }

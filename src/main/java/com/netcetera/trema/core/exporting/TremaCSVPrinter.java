@@ -1,8 +1,10 @@
 package com.netcetera.trema.core.exporting;
 
+import java.io.IOException;
 import java.io.Writer;
 
-import ch.netcetera.wake.core.format.csv.CSVPrinter;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 
 
 
@@ -11,18 +13,23 @@ import ch.netcetera.wake.core.format.csv.CSVPrinter;
  * since a CSV export has turned out to be rather a time consuming
  * operation.
  */
-public class TremaCSVPrinter extends CSVPrinter {
+public class TremaCSVPrinter   {
+
+  private CSVPrinter csvPrinter;
 
   /**
    * Create a printer that will print values to the given
    * stream. Comments will be
    * written using the default comment character '#'.
    * @param out the writer to print to
-   * @param separator the separator to use between entries
+   * @param delimiter the delimiter to use between entries
    */
-  public TremaCSVPrinter(Writer out, char separator) {
-    super(out);
-    this.setSeparatorChar(separator);
+  public TremaCSVPrinter(Writer out, char delimiter) {
+    try {
+      csvPrinter = new CSVPrinter(out, CSVFormat.DEFAULT.withDelimiter(delimiter));
+    } catch (IOException e) {
+      throw new IllegalStateException(e);
+    }
   }
 
   /**
@@ -31,16 +38,15 @@ public class TremaCSVPrinter extends CSVPrinter {
    * new line characters will be escaped.
    * @param values the values to be put out
    */
-  @Override
-  public void println(String[][] values) {
-    for (int i = 0; i < values.length; i++) {
-      println(values[i]);
+  public void print(String[][] values) throws IOException {
+    if (values == null || values.length == 0) {
+      csvPrinter.println();
+    } else {
+      for (String[] value : values) {
+        csvPrinter.printRecords(value);
+      }
     }
-    if (values.length == 0) {
-      out.println();
-    }
-    newLine = true;
-    out.flush();
+    csvPrinter.flush();
   }
 
 }
