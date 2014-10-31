@@ -1,7 +1,6 @@
 package com.netcetera.trema.core;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -32,7 +31,7 @@ public final class Status implements Comparable<Status> {
    *  <code>valueOf(String)</code> method, which, however, is not a big
    *  performance penalty since the number of available status is
    *  small. */
-  private static SortedMap<Integer, Status> instances = new TreeMap<Integer, Status>();
+  private static final SortedMap<Integer, Status> instances = new TreeMap<>();
 
   /** Status "initial". */
   public static final Status INITIAL = new Status("initial", 0);
@@ -56,7 +55,7 @@ public final class Status implements Comparable<Status> {
   private Status(final String name, final int position) {
     this.position = position;
     this.name = name;
-    instances.put(Integer.valueOf(position), this);
+    instances.put(position, this);
   }
 
   /**
@@ -112,9 +111,7 @@ public final class Status implements Comparable<Status> {
     if (name == null) {
       return UNDEFINED;
     }
-    Iterator<Status> iterator = instances.values().iterator();
-    while (iterator.hasNext()) {
-      Status status = iterator.next();
+    for (Status status : instances.values()) {
       if (name.equals(status.getName())) {
         return status;
       }
@@ -148,10 +145,9 @@ public final class Status implements Comparable<Status> {
    * corresponding status.
    */
   public static String[] getAvailableStatusNames() {
-    List<String> nameList = new ArrayList<String>();
-    Iterator<Status> iterator = instances.values().iterator();
-    while (iterator.hasNext()) {
-      nameList.add(iterator.next().getName());
+    List<String> nameList = new ArrayList<>();
+    for (Status status : instances.values()) {
+      nameList.add(status.getName());
     }
     return nameList.toArray(new String[nameList.size()]);
   }
@@ -176,11 +172,7 @@ public final class Status implements Comparable<Status> {
    */
   @Override
   public boolean equals(Object o) {
-    if (!(o instanceof Status)) {
-      return false;
-    }
-
-    return this == o;
+    return o instanceof Status && this == o;
   }
 
   /**

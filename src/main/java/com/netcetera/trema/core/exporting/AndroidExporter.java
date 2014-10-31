@@ -1,5 +1,13 @@
 package com.netcetera.trema.core.exporting;
 
+import com.netcetera.trema.common.TremaUtil;
+import com.netcetera.trema.core.Status;
+import com.netcetera.trema.core.api.IExportFilter;
+import com.netcetera.trema.core.api.IExporter;
+import com.netcetera.trema.core.api.IKeyValuePair;
+import com.netcetera.trema.core.api.ITextNode;
+import com.netcetera.trema.core.api.IValueNode;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
@@ -9,24 +17,16 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.netcetera.trema.common.TremaUtil;
-import com.netcetera.trema.core.Status;
-import com.netcetera.trema.core.api.IExportFilter;
-import com.netcetera.trema.core.api.IExporter;
-import com.netcetera.trema.core.api.IKeyValuePair;
-import com.netcetera.trema.core.api.ITextNode;
-import com.netcetera.trema.core.api.IValueNode;
-
 
 /**
  * Exports an <code>IDatabase</code> to a Android "strings.xml" file.
  */
 public class AndroidExporter implements IExporter {
 
-  private File outputFile;
-  private OutputStreamFactory outputStreamFactory;
-  private IExportFilter [] iExportFilters;
-  private HashMap<String, String> placeholderMap;
+  private final File outputFile;
+  private final OutputStreamFactory outputStreamFactory;
+  private final IExportFilter[] iExportFilters;
+  private final HashMap<String, String> placeholderMap;
 
   /**
    * Constructor.
@@ -37,10 +37,10 @@ public class AndroidExporter implements IExporter {
   public AndroidExporter(File outputFile, OutputStreamFactory outputStreamFactory) {
     this.outputFile = outputFile;
     this.outputStreamFactory = outputStreamFactory;
-    iExportFilters = new IExportFilter [1];
+    iExportFilters = new IExportFilter[1];
     iExportFilters[0] = new AndroidExportFilter();
 
-    placeholderMap = new HashMap<String, String>();
+    placeholderMap = new HashMap<>();
     placeholderMap.put("%d", "%%%d\\$d");
     placeholderMap.put("%i", "%%%d\\$d");
     placeholderMap.put("%o", "%%%d\\$o");
@@ -62,12 +62,8 @@ public class AndroidExporter implements IExporter {
   @Override
   public void export(ITextNode[] nodes, String masterlanguage, String language, Status[] states)
       throws ExportException {
-    OutputStream outputStream = null;
-    try {
-      // open output stream
-      outputStream = outputStreamFactory.createOutputStream(outputFile);
-      BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8"));
-
+    try (OutputStream outputStream = outputStreamFactory.createOutputStream(outputFile);
+         BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8"))) {
       synchronized (this) {
         // write header
         bw.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
@@ -84,10 +80,8 @@ public class AndroidExporter implements IExporter {
           if (valueNode != null) {
             if (states == null || TremaUtil.containsStatus(valueNode.getStatus(), states)) {
               IKeyValuePair keyValuePair = new KeyValuePair(node.getKey(), valueNode.getValue());
-              if (iExportFilters != null) {
-                for (IExportFilter filter : iExportFilters) {
-                  filter.filter(keyValuePair);
-                }
+              for (IExportFilter filter : iExportFilters) {
+                filter.filter(keyValuePair);
               }
 
               // validate key after it has been filtered
@@ -117,14 +111,6 @@ public class AndroidExporter implements IExporter {
 
     } catch (IOException e) {
       throw new ExportException("Could not store properties:" + e.getMessage());
-    } finally {
-      if (outputStream != null) {
-        try {
-          outputStream.close();
-        } catch (IOException e) {
-          throw new ExportException("Could not store properties:" + e.getMessage());
-        }
-      }
     }
   }
 

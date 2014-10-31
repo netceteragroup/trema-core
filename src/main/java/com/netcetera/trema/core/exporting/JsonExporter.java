@@ -1,13 +1,5 @@
 package com.netcetera.trema.core.exporting;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.charset.Charset;
-import java.util.Map.Entry;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
 import com.netcetera.trema.common.TremaUtil;
 import com.netcetera.trema.core.Status;
 import com.netcetera.trema.core.api.IExportFilter;
@@ -16,14 +8,22 @@ import com.netcetera.trema.core.api.IKeyValuePair;
 import com.netcetera.trema.core.api.ITextNode;
 import com.netcetera.trema.core.api.IValueNode;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.charset.Charset;
+import java.util.Map.Entry;
+import java.util.SortedMap;
+import java.util.TreeMap;
+
 /**
  * Exporter for the JSON format.
  */
 public class JsonExporter implements IExporter {
   private static final Charset UTF_8 = Charset.forName("UTF-8");
 
-  private File outputFile;
-  private OutputStreamFactory outputStreamFactory;
+  private final File outputFile;
+  private final OutputStreamFactory outputStreamFactory;
   private IExportFilter[] iExportFilters;
 
   /**
@@ -53,7 +53,7 @@ public class JsonExporter implements IExporter {
    * @return the {@link SortedMap} containing the keys and translations
    */
   protected SortedMap<String, String> getProperties(ITextNode[]nodes, String language, Status[] status) {
-    TreeMap<String, String> map = new TreeMap<String, String>();
+    TreeMap<String, String> map = new TreeMap<>();
     for (ITextNode node : nodes) {
       IValueNode valueNode = node.getValueNode(language);
       if (valueNode != null) {
@@ -89,22 +89,12 @@ public class JsonExporter implements IExporter {
   @Override
   public void export(ITextNode[] nodes, String masterlanguage, String language, Status[] states)
       throws ExportException {
-    OutputStream outputStream = null;
     SortedMap<String, String> props = getProperties(nodes, language, states);
     String jsonString = toJsonString(props);
-    try {
-      outputStream = outputStreamFactory.createOutputStream(outputFile);
+    try (OutputStream outputStream = outputStreamFactory.createOutputStream(outputFile)) {
       outputStream.write(jsonString.getBytes(UTF_8));
     } catch (IOException e) {
       throw new ExportException("Could not write json:" + e.getMessage());
-    } finally {
-      if (outputStream != null) {
-        try {
-          outputStream.close();
-        } catch (IOException e) {
-          throw new ExportException("Could not close json output stream:" + e.getMessage());
-        }
-      }
     }
   }
 

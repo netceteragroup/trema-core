@@ -1,13 +1,5 @@
 package com.netcetera.trema.core.exporting;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.Properties;
-import java.util.TreeSet;
-
 import com.netcetera.trema.common.TremaUtil;
 import com.netcetera.trema.core.Status;
 import com.netcetera.trema.core.api.IExportFilter;
@@ -16,6 +8,14 @@ import com.netcetera.trema.core.api.IKeyValuePair;
 import com.netcetera.trema.core.api.ITextNode;
 import com.netcetera.trema.core.api.IValueNode;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.Properties;
+import java.util.TreeSet;
+
 
 
 /**
@@ -23,8 +23,8 @@ import com.netcetera.trema.core.api.IValueNode;
  */
 public class PropertiesExporter implements IExporter {
 
-  private File outputFile;
-  private OutputStreamFactory outputStreamFactory;
+  private final File outputFile;
+  private final OutputStreamFactory outputStreamFactory;
   private IExportFilter [] iExportFilters;
 
 
@@ -77,22 +77,12 @@ public class PropertiesExporter implements IExporter {
   @Override
   public void export(ITextNode[] nodes, String masterlanguage, String language, Status[] states)
       throws ExportException {
-    OutputStream outputStream = null;
-    try {
-      outputStream = outputStreamFactory.createOutputStream(outputFile);
+    try (OutputStream outputStream = outputStreamFactory.createOutputStream(outputFile)) {
       String header = "Generated file - do not edit";
       SortedProperties props = getProperties(nodes, language, states);
       props.store(outputStream, header);
     } catch (IOException e) {
       throw new ExportException("Could not store properties:" + e.getMessage());
-    } finally {
-      if (outputStream != null) {
-          try {
-            outputStream.close();
-          } catch (IOException e) {
-            throw new ExportException("Could not store properties:" + e.getMessage());
-          }
-      }
     }
   }
 
@@ -106,7 +96,7 @@ public class PropertiesExporter implements IExporter {
      */
     @Override
     public synchronized Enumeration<Object> keys() {
-      return Collections.enumeration(new TreeSet<Object>(super.keySet()));
+      return Collections.enumeration(new TreeSet<>(super.keySet()));
     }
   }
 }

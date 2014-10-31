@@ -1,17 +1,9 @@
 package com.netcetera.trema.core;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-
+import com.netcetera.trema.core.api.IDatabase;
+import com.netcetera.trema.core.api.IDatabaseListener;
+import com.netcetera.trema.core.api.ITextNode;
+import com.netcetera.trema.core.api.IValueNode;
 import org.jdom.Attribute;
 import org.jdom.Comment;
 import org.jdom.Document;
@@ -28,10 +20,16 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXParseException;
 
-import com.netcetera.trema.core.api.IDatabase;
-import com.netcetera.trema.core.api.IDatabaseListener;
-import com.netcetera.trema.core.api.ITextNode;
-import com.netcetera.trema.core.api.IValueNode;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Hashtable;
+import java.util.List;
 
 
 
@@ -52,14 +50,14 @@ public class XMLDatabase implements IDatabase {
   private static final String LANGUAGE_ATTRIBUTE_NAME = "lang";
   private static final String STATUS_ATTRIBUTE_NAME = "status";
 
-  private List<IDatabaseListener> listeners = new ArrayList<IDatabaseListener>();
+  private final List<IDatabaseListener> listeners = new ArrayList<>();
   private String masterLanguage = null;
   //root element attributes besides "masterLang"
-  private List<Attribute> additionalRootAttrs = new ArrayList<Attribute>();
-  private List<Namespace> additionalNamespaces = new ArrayList<Namespace>();
-  private List<ITextNode> textNodeList = new ArrayList<ITextNode>();
+  private final List<Attribute> additionalRootAttrs = new ArrayList<>();
+  private List<Namespace> additionalNamespaces = new ArrayList<>();
+  private final List<ITextNode> textNodeList = new ArrayList<>();
   private boolean treatWarningsAsErrors = true;
-  private List<ParseWarning> parseWarnings = new ArrayList<ParseWarning>();
+  private final List<ParseWarning> parseWarnings = new ArrayList<>();
   private boolean xmlInternalized = false;
 
 
@@ -172,7 +170,7 @@ public class XMLDatabase implements IDatabase {
     masterLanguage = null;
     additionalRootAttrs.clear();
     // the collection is not modifiable and therefore cannot be cleared.
-    additionalNamespaces = new ArrayList<Namespace>();
+    additionalNamespaces = new ArrayList<>();
     textNodeList.clear();
     parseWarnings.clear();
   }
@@ -186,10 +184,10 @@ public class XMLDatabase implements IDatabase {
     init();
 
     // temporarily remove the database listeners
-    List<IDatabaseListener> tmpListeners = new ArrayList<IDatabaseListener>(listeners);
+    List<IDatabaseListener> tmpListeners = new ArrayList<>(listeners);
     listeners.clear();
 
-    Hashtable<String, String> keyMap = new Hashtable<String, String>();
+    Hashtable<String, String> keyMap = new Hashtable<>();
 
     try {
       Element rootElement = document.getRootElement();
@@ -332,9 +330,7 @@ public class XMLDatabase implements IDatabase {
       rootElement.addNamespaceDeclaration(namespace);
     }
 
-    Iterator<ITextNode> textIterator = textNodeList.iterator();
-    while (textIterator.hasNext()) {
-      ITextNode textNode = textIterator.next();
+    for (ITextNode textNode : textNodeList) {
       String key = textNode.getKey();
       Element textElement = new Element(TEXT_ELEMENT_NAME);
       textElement.setAttribute(KEY_ATTRIBUTE_NAME, key);
@@ -383,11 +379,9 @@ public class XMLDatabase implements IDatabase {
    */
   @Override
   public ITextNode getTextNode(String key) {
-    Iterator<ITextNode> iterator = textNodeList.iterator();
-    while (iterator.hasNext()) {
-      ITextNode textNode = iterator.next();
-      if (key.equals(textNode.getKey())) {
-        return textNode;
+    for (ITextNode node : textNodeList) {
+      if (key.equals(node.getKey())) {
+        return node;
       }
     }
     return null;
@@ -517,10 +511,9 @@ public class XMLDatabase implements IDatabase {
   /** {@inheritDoc} */
   @Override
   public Collection<String> getKeysAsCollection() {
-    List<String> keyList = new ArrayList<String>();
-    Iterator<ITextNode> i = textNodeList.iterator();
-    while (i.hasNext()) {
-      keyList.add(((XMLTextNode) i.next()).getKey());
+    List<String> keyList = new ArrayList<>();
+    for (ITextNode node : textNodeList) {
+      keyList.add(node.getKey());
     }
     return keyList;
   }

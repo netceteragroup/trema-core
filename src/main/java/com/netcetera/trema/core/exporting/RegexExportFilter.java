@@ -1,10 +1,10 @@
 package com.netcetera.trema.core.exporting;
 
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
-
 import com.netcetera.trema.core.api.IExportFilter;
 import com.netcetera.trema.core.api.IKeyValuePair;
+
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 
 /**
@@ -12,9 +12,9 @@ import com.netcetera.trema.core.api.IKeyValuePair;
  */
 public class RegexExportFilter implements IExportFilter {
 
-  private Pattern pattern;
-  private String replacement;
-  
+  private final Pattern pattern;
+  private final String replacement;
+
   /**
    * @param regex the regex to match
    * @param replacement the replacement for the match

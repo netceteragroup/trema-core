@@ -64,8 +64,7 @@ public class AndroidExportFilter implements IExportFilter {
    */
   protected static String escapeKeyName(String keyName) {
     // replace dot with underscore
-    String result = keyName.replaceAll("[\\.\\-]", "\\_");
-    return result;
+    return keyName.replaceAll("[\\.\\-]", "\\_");
   }
 
 }

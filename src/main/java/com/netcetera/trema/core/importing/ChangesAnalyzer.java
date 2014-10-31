@@ -1,13 +1,13 @@
 package com.netcetera.trema.core.importing;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.netcetera.trema.core.Status;
 import com.netcetera.trema.core.api.IDatabase;
 import com.netcetera.trema.core.api.IImportSource;
 import com.netcetera.trema.core.api.ITextNode;
 import com.netcetera.trema.core.api.IValueNode;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 
@@ -24,10 +24,10 @@ public class ChangesAnalyzer {
   private IDatabase db = null;
 
   /** The conflicting changes. */
-  private List<Change> conflictingChanges = new ArrayList<Change>();
+  private final List<Change> conflictingChanges = new ArrayList<>();
 
   /** The non-conflicting changes. */
-  private List<Change> nonConflictingChanges = new ArrayList<Change>();
+  private final List<Change> nonConflictingChanges = new ArrayList<>();
 
   private boolean useMasterValueFromFile = true;
 
@@ -66,10 +66,8 @@ public class ChangesAnalyzer {
    * and classifies them as conflicting and non-conflicting.
    */
   public void analyze() {
-    String[] importedKeys = importSource.getKeys();
-
-    for (int i = 0; i < importedKeys.length; i++) {
-      Change change = createChange(importedKeys[i]);
+    for (String key : importSource.getKeys()) {
+      Change change = createChange(key);
       setConflictAttributes(change);
 
       if (change.getType() != Change.TYPE_NO_CHANGE) {

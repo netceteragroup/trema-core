@@ -1,10 +1,7 @@
 package com.netcetera.trema.core.importing;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.Hashtable;
-import java.util.logging.Logger;
-
+import com.netcetera.trema.core.ParseException;
+import com.netcetera.trema.core.Status;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
@@ -13,8 +10,10 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 
-import com.netcetera.trema.core.ParseException;
-import com.netcetera.trema.core.Status;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Hashtable;
+import java.util.logging.Logger;
 
 /**
  * Represents a XLS text resource file.
@@ -31,17 +30,15 @@ public class XLSFile extends AbstractFile {
   private String masterLanguage = null;
   private String language = null;
 
-  private Hashtable<String, Integer> cellMap = new Hashtable<>();
+  private final Hashtable<String, Integer> cellMap = new Hashtable<>();
 
   /**
    * Constructs a new CSV file from a path name.
    * @param pathName the path
    * @throws ParseException if any parse errors ocur
    * supported
-   * @throws IOException if any IO errors occur
    */
-  public XLSFile(String pathName)
-  throws ParseException, IOException {
+  public XLSFile(String pathName) throws ParseException {
     this.pathName = pathName;
     FileInputStream fileInputStream = null;
     try {
@@ -122,9 +119,8 @@ public class XLSFile extends AbstractFile {
   /**
    * Parses a CSV file from a given reader.
    * @throws ParseException if any parse errors ocur
-   * @throws IOException if any IO errors occur
    */
-  private void parse(Workbook ws) throws IOException, ParseException {
+  private void parse(Workbook ws) throws ParseException {
     Sheet sheet = ws.getSheet(SHEET_NAME);
     if (sheet == null) {
       sheet = ws.getSheetAt(0);
