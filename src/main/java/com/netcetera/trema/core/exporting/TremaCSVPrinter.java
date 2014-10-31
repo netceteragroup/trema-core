@@ -43,7 +43,7 @@ public class TremaCSVPrinter   {
       csvPrinter.println();
     } else {
       for (String[] value : values) {
-        csvPrinter.printRecords(value);
+        csvPrinter.printRecords((Object)value);
       }
     }
     csvPrinter.flush();

@@ -1,6 +1,6 @@
 package com.netcetera.trema.core.exporting;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import com.netcetera.trema.core.api.IExportFilter;
 import com.netcetera.trema.core.api.IKeyValuePair;
