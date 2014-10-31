@@ -20,26 +20,27 @@ public class AndroidExportFilter implements IExportFilter {
 
   /**
    * Android specific escaping of characters. Note that since this is no real XML escaping, the
-   * output string.xml file is potenticially not valid xml. However this is explicitly allowed by
+   * output string.xml file is potentially not valid XML. However this is explicitly allowed by
    * Android.
    *
    * <P>
    * The following characters are replaced with corresponding character entities :
-   * <table border='1' cellpadding='3' cellspacing='0'>
+   * <table border='1' cellpadding='3' cellspacing='0' summary="' is replaced with char 39,
+   * amp is replaced with entity amp">
    * <tr>
    * <th>Character</th>
    * <th>Encoding</th>
    * </tr>
    * <tr>
    * <td>'</td>
-   * <td>\\&amp#039;</td>
+   * <td>\\&amp;#039;</td>
    * </tr>
    * <tr>
    * <td>\'</td>
-   * <td>\\&amp#039;</td>
+   * <td>\\&amp;#039;</td>
    * </tr>
    * <tr>
-   * <td>&</td>
+   * <td>&amp;</td>
    * <td>&amp;amp;</td>
    * </tr>
    * </table>

@@ -76,18 +76,18 @@ public class JsonExporter implements IExporter {
    * Write the translation for the desired language and states into a JSON file in the format:
    * <pre>
    *   {
-   *     <key>: '<value>',
+   *     &lt;key&gt;: '&lt;value&gt;',
    *     ...
    *   }
    * </pre>
    * @param nodes the nodes to export
-   * @param masterlanguage the master language
+   * @param masterLanguage the master language
    * @param language the language to export
    * @param states the states to export (all if null)
-   * @throws com.netcetera.trema.core.exporting.ExportException
+   * @throws ExportException thrown if export fails
    */
   @Override
-  public void export(ITextNode[] nodes, String masterlanguage, String language, Status[] states)
+  public void export(ITextNode[] nodes, String masterLanguage, String language, Status[] states)
       throws ExportException {
     SortedMap<String, String> props = getProperties(nodes, language, states);
     String jsonString = toJsonString(props);

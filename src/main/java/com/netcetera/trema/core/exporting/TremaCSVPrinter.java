@@ -1,10 +1,10 @@
 package com.netcetera.trema.core.exporting;
 
-import java.io.IOException;
-import java.io.Writer;
-
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
+
+import java.io.IOException;
+import java.io.Writer;
 
 
 
@@ -37,6 +37,7 @@ public class TremaCSVPrinter   {
    * The values will be quoted if needed. Quotes and
    * new line characters will be escaped.
    * @param values the values to be put out
+   * @throws IOException if printing to the stream fails
    */
   public void print(String[][] values) throws IOException {
     if (values == null || values.length == 0) {
