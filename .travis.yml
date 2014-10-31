@@ -2,3 +2,7 @@ language: java
 jdk:
 - oraclejdk7
 - openjdk7
+after_success:
+- mvn clean test jacoco:report coveralls:jacoco
+env:
+  secure: "mWzxU4KxZyEcHWxU56odTq1CyA4mYVJkHBJsqjkqRIgPa9pTl9oYlsZ7XM1g8W909aZG0olP0/lzp8dw/bo6xE0/eI06mMAkDalEICPOTCZ8VZYV1I+SV1iHyYnB05QUKYoTnzLk7tjo39D9xGnGpVZB9r6ARZalpPz7OwBdus4="
