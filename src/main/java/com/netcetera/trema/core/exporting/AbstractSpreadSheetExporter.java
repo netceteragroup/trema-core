@@ -3,7 +3,7 @@ package com.netcetera.trema.core.exporting;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 
 import com.netcetera.trema.common.TremaUtil;
 import com.netcetera.trema.core.Status;
@@ -26,7 +26,7 @@ public abstract class AbstractSpreadSheetExporter implements IExporter {
    * @return the header row.
    */
   protected String [] getHeaderRow(String masterlanguage, String[] languages) {
-    List<String> headerRow = new ArrayList<String>();
+    List<String> headerRow = new ArrayList<>();
     headerRow.add(AbstractFile.KEY_HEADER);
     headerRow.add(AbstractFile.STATUS_HEADER);
     if (!ArrayUtils.contains(languages, masterlanguage)) {
@@ -48,7 +48,7 @@ public abstract class AbstractSpreadSheetExporter implements IExporter {
    * @return the row.
    */
   protected String[] getRow(String masterLanguage, ITextNode textNode, IValueNode valueNode) {
-    List<String> row = new ArrayList<String>();
+    List<String> row = new ArrayList<>();
 
     row.add(textNode.getKey());
     row.add(valueNode.getStatus().getName());
@@ -79,7 +79,7 @@ public abstract class AbstractSpreadSheetExporter implements IExporter {
    */
   protected String[][] getValues(ITextNode[] textNodes, String masterLanguage, String language, Status[] status) {
     int numberOfColumns = (masterLanguage.equals(language)) ? 4 : 5;
-    List<String[]> rows = new ArrayList<String[]>();
+    List<String[]> rows = new ArrayList<>();
 
     // add the header row
     rows.add(getHeaderRow(masterLanguage, new String[]{language}));

@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.util.Hashtable;
 import java.util.logging.Logger;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.Cell;
@@ -15,8 +15,6 @@ import org.apache.poi.ss.usermodel.Workbook;
 
 import com.netcetera.trema.core.ParseException;
 import com.netcetera.trema.core.Status;
-
-
 
 /**
  * Represents a XLS text resource file.
@@ -33,7 +31,7 @@ public class XLSFile extends AbstractFile {
   private String masterLanguage = null;
   private String language = null;
 
-  private Hashtable<String, Integer> cellMap = new Hashtable<String , Integer>();
+  private Hashtable<String, Integer> cellMap = new Hashtable<>();
 
   /**
    * Constructs a new CSV file from a path name.
@@ -77,17 +75,17 @@ public class XLSFile extends AbstractFile {
       if (value == null) {
         continue;
       }
-      if (value.indexOf(AbstractFile.KEY_HEADER) >= 0) {
-        cellMap.put(AbstractFile.KEY_HEADER, Integer.valueOf(i));
+      if (value.contains(AbstractFile.KEY_HEADER)) {
+        cellMap.put(AbstractFile.KEY_HEADER, i);
         LOG.info("Key column found in Header, column index is: " + i);
-      } else if (value.indexOf(AbstractFile.STATUS_HEADER) >= 0) {
-        cellMap.put(AbstractFile.STATUS_HEADER, Integer.valueOf(i));
+      } else if (value.contains(AbstractFile.STATUS_HEADER)) {
+        cellMap.put(AbstractFile.STATUS_HEADER, i);
         LOG.info("Status column found in Header, column index is: " + i);
-      } else if (value.indexOf(AbstractFile.CONTEXT_HEADER) >= 0) {
-        cellMap.put(AbstractFile.CONTEXT_HEADER, Integer.valueOf(i));
+      } else if (value.contains(AbstractFile.CONTEXT_HEADER)) {
+        cellMap.put(AbstractFile.CONTEXT_HEADER, i);
         LOG.info("Context column found in Header, column index is: " + i);
-      } else if (value.indexOf(AbstractFile.MASTER_HEADER) >= 0) {
-        cellMap.put(AbstractFile.MASTER_HEADER, Integer.valueOf(i));
+      } else if (value.contains(AbstractFile.MASTER_HEADER)) {
+        cellMap.put(AbstractFile.MASTER_HEADER, i);
         LOG.info("Master column found in Header, column index is: " + i);
         String master = StringUtils.substringBetween(value, "(", ")");
         if (master == null) {
@@ -95,8 +93,8 @@ public class XLSFile extends AbstractFile {
         } else {
           masterLanguage = master;
         }
-      } else if (value.indexOf(AbstractFile.VALUE_HEADER) >= 0) {
-        cellMap.put(AbstractFile.VALUE_HEADER, Integer.valueOf(i));
+      } else if (value.contains(AbstractFile.VALUE_HEADER)) {
+        cellMap.put(AbstractFile.VALUE_HEADER, i);
         LOG.info("Value column found in Header, column index is: " + i);
         String lang = StringUtils.substringBetween(value, "(", ")");
         if (lang == null) {
@@ -186,7 +184,7 @@ public class XLSFile extends AbstractFile {
       throw new ParseException(
           "Cell is null, rownumber:" + rowNumber + ", columntype:" + columnType);
     }
-    String cellText = null;
+    String cellText;
     int cellType = cell.getCellType();
     switch (cellType) {
       case Cell.CELL_TYPE_STRING:
