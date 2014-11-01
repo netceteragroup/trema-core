@@ -6,6 +6,6 @@ Trema Core
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.netcetera.trema/trema-core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.netcetera.trema/trema-core/)
 
 Trema foundation for the following "client" plugins
-- [Trema Maven Plugin](https://github.com/netceteragroup/trema-maven-plugin)
+- [Trema Maven Plugin](https://github.com/netceteragroup/trema-maven)
 - [Trema Eclipse Plugin](https://github.com/netceteragroup/trema-eclipse)
 - [Trema IntelliJ Plugin](https://github.com/netceteragroup/trema-intellij)
