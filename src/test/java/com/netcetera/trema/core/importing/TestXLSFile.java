@@ -6,7 +6,6 @@ import org.junit.Test;
 
 import com.netcetera.trema.core.Status;
 import com.netcetera.trema.core.api.IImportSource;
-import com.netcetera.trema.core.importing.XLSFile;
 
 
 /**

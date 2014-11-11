@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.ArrayUtils;
 
-import com.netcetera.trema.common.TremaUtil;
+import com.netcetera.trema.common.TremaCoreUtil;
 import com.netcetera.trema.core.Status;
 import com.netcetera.trema.core.api.IExporter;
 import com.netcetera.trema.core.api.ITextNode;
@@ -87,7 +87,7 @@ public abstract class AbstractSpreadSheetExporter implements IExporter {
     for (ITextNode textNode : textNodes) {
       IValueNode valueNode = textNode.getValueNode(language);
       if (valueNode != null) {
-        if (status == null || TremaUtil.containsStatus(valueNode.getStatus(), status)) {
+        if (status == null || TremaCoreUtil.containsStatus(valueNode.getStatus(), status)) {
           rows.add(getRow(masterLanguage, textNode, valueNode)); // add the row
         }
       }

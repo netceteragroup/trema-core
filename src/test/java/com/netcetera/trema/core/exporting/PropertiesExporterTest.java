@@ -14,11 +14,6 @@ import org.junit.Test;
 import com.netcetera.trema.core.Status;
 import com.netcetera.trema.core.XMLDatabase;
 import com.netcetera.trema.core.api.IKeyValuePair;
-import com.netcetera.trema.core.exporting.AddKeyToValueExportFilter;
-import com.netcetera.trema.core.exporting.FileOutputStreamFactory;
-import com.netcetera.trema.core.exporting.KeyValuePair;
-import com.netcetera.trema.core.exporting.MessageFormatEscapingFilter;
-import com.netcetera.trema.core.exporting.PropertiesExporter;
 
 
 

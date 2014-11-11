@@ -1,13 +1,5 @@
 package com.netcetera.trema.core.exporting;
 
-import com.netcetera.trema.common.TremaUtil;
-import com.netcetera.trema.core.Status;
-import com.netcetera.trema.core.api.IExportFilter;
-import com.netcetera.trema.core.api.IExporter;
-import com.netcetera.trema.core.api.IKeyValuePair;
-import com.netcetera.trema.core.api.ITextNode;
-import com.netcetera.trema.core.api.IValueNode;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
@@ -16,6 +8,14 @@ import java.io.OutputStreamWriter;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.netcetera.trema.common.TremaCoreUtil;
+import com.netcetera.trema.core.Status;
+import com.netcetera.trema.core.api.IExportFilter;
+import com.netcetera.trema.core.api.IExporter;
+import com.netcetera.trema.core.api.IKeyValuePair;
+import com.netcetera.trema.core.api.ITextNode;
+import com.netcetera.trema.core.api.IValueNode;
 
 
 /**
@@ -58,7 +58,6 @@ public class AndroidExporter implements IExporter {
   }
 
   /** {@inheritDoc} */
-  @SuppressWarnings("resource")
   @Override
   public void export(ITextNode[] nodes, String masterlanguage, String language, Status[] states)
       throws ExportException {
@@ -78,7 +77,7 @@ public class AndroidExporter implements IExporter {
 
           // get value from value node
           if (valueNode != null) {
-            if (states == null || TremaUtil.containsStatus(valueNode.getStatus(), states)) {
+            if (states == null || TremaCoreUtil.containsStatus(valueNode.getStatus(), states)) {
               IKeyValuePair keyValuePair = new KeyValuePair(node.getKey(), valueNode.getValue());
               for (IExportFilter filter : iExportFilters) {
                 filter.filter(keyValuePair);
@@ -95,8 +94,9 @@ public class AndroidExporter implements IExporter {
               String value = keyValuePair.getValue();
               if (value != null) {
                 String formattedText = resolveIOSPlaceholders(value);
-                String rowText = String.format("  <string name=\"%s\">%s</string>\n", key, formattedText);
+                String rowText = String.format("  <string name=\"%s\">%s</string>", key, formattedText);
                 bw.write(rowText);
+                bw.write("\n");
               }
             }
           }

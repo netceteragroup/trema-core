@@ -1,6 +1,6 @@
 package com.netcetera.trema.core.exporting;
 
-import com.netcetera.trema.common.TremaUtil;
+import com.netcetera.trema.common.TremaCoreUtil;
 import com.netcetera.trema.core.Status;
 import com.netcetera.trema.core.api.IExportFilter;
 import com.netcetera.trema.core.api.IExporter;
@@ -51,7 +51,7 @@ public class PropertiesExporter implements IExporter {
     for (ITextNode node : nodes) {
       IValueNode valueNode = node.getValueNode(language);
       if (valueNode != null) {
-        if (status == null || TremaUtil.containsStatus(valueNode.getStatus(), status)) {
+        if (status == null || TremaCoreUtil.containsStatus(valueNode.getStatus(), status)) {
           IKeyValuePair keyValuePair = new KeyValuePair(node.getKey(), valueNode.getValue());
           if (iExportFilters != null) {
             for (IExportFilter filter : iExportFilters) {

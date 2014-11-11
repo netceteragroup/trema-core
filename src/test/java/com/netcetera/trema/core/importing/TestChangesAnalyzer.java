@@ -8,9 +8,6 @@ import com.netcetera.trema.core.XMLDatabase;
 import com.netcetera.trema.core.XMLTextNode;
 import com.netcetera.trema.core.XMLValueNode;
 import com.netcetera.trema.core.api.ITextNode;
-import com.netcetera.trema.core.importing.CSVFile;
-import com.netcetera.trema.core.importing.Change;
-import com.netcetera.trema.core.importing.ChangesAnalyzer;
 
 
 

@@ -3,9 +3,6 @@ package com.netcetera.trema.core;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.netcetera.trema.core.ParseException;
-import com.netcetera.trema.core.XMLDatabase;
-
 
 
 /**

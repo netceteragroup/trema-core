@@ -5,8 +5,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.netcetera.trema.core.api.IKeyValuePair;
-import com.netcetera.trema.core.exporting.HtmlLineBreakConverter;
-import com.netcetera.trema.core.exporting.KeyValuePair;
 
 /**
  * Test class.

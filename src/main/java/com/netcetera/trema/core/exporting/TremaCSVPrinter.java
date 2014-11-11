@@ -1,10 +1,10 @@
 package com.netcetera.trema.core.exporting;
 
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
-
 import java.io.IOException;
 import java.io.Writer;
+
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 
 
 
@@ -44,7 +44,7 @@ public class TremaCSVPrinter   {
       csvPrinter.println();
     } else {
       for (String[] value : values) {
-        csvPrinter.printRecords((Object)value);
+        csvPrinter.printRecords((Object) value);
       }
     }
     csvPrinter.flush();

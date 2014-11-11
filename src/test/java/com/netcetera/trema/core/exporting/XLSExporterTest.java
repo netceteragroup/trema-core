@@ -9,7 +9,6 @@ import com.netcetera.trema.core.Status;
 import com.netcetera.trema.core.TestConstants;
 import com.netcetera.trema.core.XMLDatabase;
 import com.netcetera.trema.core.api.IImportSource;
-import com.netcetera.trema.core.exporting.XLSExporter;
 import com.netcetera.trema.core.importing.XLSFile;
 
 

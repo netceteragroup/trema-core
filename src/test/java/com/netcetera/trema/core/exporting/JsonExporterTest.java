@@ -18,9 +18,6 @@ import com.netcetera.trema.core.XMLDatabase;
 import com.netcetera.trema.core.api.IExportFilter;
 import com.netcetera.trema.core.api.IKeyValuePair;
 import com.netcetera.trema.core.api.ITextNode;
-import com.netcetera.trema.core.exporting.ExportException;
-import com.netcetera.trema.core.exporting.JsonExporter;
-import com.netcetera.trema.core.exporting.OutputStreamFactory;
 
 /**
  * Test for the JsonExporter.

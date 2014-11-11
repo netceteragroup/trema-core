@@ -3,8 +3,6 @@ package com.netcetera.trema.core.exporting;
 import org.junit.Test;
 
 import com.netcetera.trema.core.api.IKeyValuePair;
-import com.netcetera.trema.core.exporting.AndroidExportFilter;
-import com.netcetera.trema.core.exporting.KeyValuePair;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;

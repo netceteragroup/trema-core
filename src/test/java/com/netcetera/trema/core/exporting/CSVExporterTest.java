@@ -1,11 +1,12 @@
 package com.netcetera.trema.core.exporting;
 
-import com.netcetera.trema.common.TremaUtil;
-import com.netcetera.trema.core.Status;
-import com.netcetera.trema.core.XMLDatabase;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.google.common.base.Joiner;
+import com.netcetera.trema.core.Status;
+import com.netcetera.trema.core.XMLDatabase;
 
 /**
  * Unit test for the <code>CSVExporter</code> class.
@@ -48,7 +49,7 @@ public class CSVExporterTest {
     Assert.assertEquals(4, values.length);
 
     // header
-    Assert.assertEquals("Key;Status;Master (de);Value (fr);Context", TremaUtil.arrayToString(values[0], ";"));
+    Assert.assertEquals("Key;Status;Master (de);Value (fr);Context", arrayToList(values));
 
     // first row
     Assert.assertEquals(5, values[1].length);
@@ -85,7 +86,7 @@ public class CSVExporterTest {
     Assert.assertEquals(3, values.length);
 
     // header
-    Assert.assertEquals("Key;Status;Master (de);Value (fr);Context", TremaUtil.arrayToString(values[0], ";"));
+    Assert.assertEquals("Key;Status;Master (de);Value (fr);Context", arrayToList(values));
 
     // first row
     Assert.assertEquals(5, values[1].length);
@@ -114,7 +115,7 @@ public class CSVExporterTest {
     Assert.assertEquals(2, values.length);
 
     // header
-    Assert.assertEquals("Key;Status;Master (de);Value (fr);Context", TremaUtil.arrayToString(values[0], ";"));
+    Assert.assertEquals("Key;Status;Master (de);Value (fr);Context", arrayToList(values));
 
     // first row
     Assert.assertEquals(5, values[1].length);
@@ -143,7 +144,7 @@ public class CSVExporterTest {
     Assert.assertEquals(4, values.length);
 
     // header
-    Assert.assertEquals("Key;Status;Value (de);Context", TremaUtil.arrayToString(values[0], ";"));
+    Assert.assertEquals("Key;Status;Value (de);Context", arrayToList(values));
 
     // first row
     Assert.assertEquals(4, values[1].length);
@@ -165,6 +166,10 @@ public class CSVExporterTest {
     Assert.assertEquals("special", values[3][1]);
     Assert.assertEquals("masterValue3", values[3][2]);
     Assert.assertEquals("context3", values[3][3]);
+  }
+
+  private String arrayToList(String[][] values) {
+    return Joiner.on(";").join(values[0]);
   }
 
 }

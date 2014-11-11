@@ -8,10 +8,6 @@ import java.io.IOException;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.netcetera.trema.core.Status;
-import com.netcetera.trema.core.XMLDatabase;
-import com.netcetera.trema.core.XMLTextNode;
-import com.netcetera.trema.core.XMLValueNode;
 import com.netcetera.trema.core.api.ITextNode;
 import com.netcetera.trema.core.api.IValueNode;
 
@@ -85,7 +81,6 @@ public class TestXMLDatabase {
    *
    * @throws Exception incase the test fails
    */
-  @SuppressWarnings("resource")
   @Test
   public void testUTF8() throws Exception {
     XMLDatabase db = new XMLDatabase();
@@ -102,7 +97,6 @@ public class TestXMLDatabase {
    *
    * @throws Exception incase the test fails
    */
-  @SuppressWarnings("resource")
   @Test
   public void testISO() throws Exception {
     XMLDatabase db = new XMLDatabase();

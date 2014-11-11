@@ -3,7 +3,7 @@
 
   <groupId>com.netcetera.trema</groupId>
   <artifactId>trema-core</artifactId>
-  <version>0.2.0.SNAPSHOT</version>
+  <version>0.2.0-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>${project.artifactId}</name>
   <description>Trema - Text resource management</description>
@@ -81,6 +81,7 @@
     <plexus-build-api.version>0.0.7</plexus-build-api.version>
     <poi.version>3.10-FINAL</poi.version>
     <xerces.version>2.11.0</xerces.version>
+    <guava.version>16.0.1</guava.version>
 
     <!-- Plugins -->
     <coveralls-maven-plugin.version>3.0.1</coveralls-maven-plugin.version>
@@ -154,6 +155,11 @@
   </dependencyManagement>
 
   <dependencies>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>${guava.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-csv</artifactId>

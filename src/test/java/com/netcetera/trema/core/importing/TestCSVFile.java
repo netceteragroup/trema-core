@@ -1,11 +1,12 @@
 package com.netcetera.trema.core.importing;
 
-import com.netcetera.trema.core.ParseException;
-import com.netcetera.trema.core.Status;
+import java.io.StringReader;
+
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.StringReader;
+import com.netcetera.trema.core.ParseException;
+import com.netcetera.trema.core.Status;
 
 
 /**
