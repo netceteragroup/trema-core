@@ -1,18 +1,17 @@
 package com.netcetera.trema.core.importing;
 
-import java.io.StringReader;
-
+import com.netcetera.trema.core.ParseException;
+import com.netcetera.trema.core.Status;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.netcetera.trema.core.ParseException;
-import com.netcetera.trema.core.Status;
+import java.io.StringReader;
 
 
 /**
  * Unit test for the <code>CSVFile</code> class.
  */
-public class TestCSVFile {
+public class CSVFileTest {
   /**
    * According to RFC 4180, line breaks are delimited by CRLF
    */
@@ -28,7 +27,7 @@ public class TestCSVFile {
   public void testValidFile1() throws Exception {
     StringBuilder contents = new StringBuilder();
     contents.append("Key;Status;Master (de);Value (fr);Context" + CRLF);
-    contents.append("key1;initial;masterValue1;value1���;context1" + CRLF);
+    contents.append("key1;initial;masterValue1;value1öäü;context1" + CRLF);
     contents.append("key2;translated;masterValue2;value2;context2");
     CSVFile csvFile = new CSVFile(new StringReader(contents.toString()), ';');
 
@@ -41,7 +40,7 @@ public class TestCSVFile {
     // key1
     Assert.assertTrue(Status.INITIAL == csvFile.getStatus("key1"));
     Assert.assertEquals("masterValue1", csvFile.getMasterValue("key1"));
-    Assert.assertEquals("value1���", csvFile.getValue("key1"));
+    Assert.assertEquals("value1öäü", csvFile.getValue("key1"));
 
     // key2
     Assert.assertTrue(Status.TRANSLATED == csvFile.getStatus("key2"));

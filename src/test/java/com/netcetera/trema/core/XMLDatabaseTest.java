@@ -1,22 +1,24 @@
 package com.netcetera.trema.core;
 
+import com.google.common.base.Charsets;
+import com.google.common.io.Files;
+import com.netcetera.trema.core.api.ITextNode;
+import com.netcetera.trema.core.api.IValueNode;
+import org.junit.Assert;
+import org.junit.Test;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import org.junit.Assert;
-import org.junit.Test;
-
-import com.netcetera.trema.core.api.ITextNode;
-import com.netcetera.trema.core.api.IValueNode;
-
+import static org.hamcrest.CoreMatchers.is;
 
 
 /**
  * Unit test for the <code>XMLDatabase</code> class.
  */
-public class TestXMLDatabase {
+public class XMLDatabaseTest {
 
   private static final String TEST_KEY = "testKey";
   private static final String TEST_LANGUAGE = "jp";
@@ -33,19 +35,19 @@ public class TestXMLDatabase {
     XMLDatabase db = new XMLDatabase();
     for (int i = 0; i < 3; i++) { // build the database 3 times
       db.build("<?xml version='1.0' encoding='UTF-8'?><trema masterLang='de'>"
-               + " !-- test comment -->"
+               + "<!-- test comment -->"
                + "<text key='key1'> <context>context1</context>"
                + "  <value lang='de' status='special'>masterValue1\u12AB</value>"
-               + "  <value lang='fr' status='initial'>value1���</value>"
+               + "  <value lang='fr' status='initial'>value1äöü</value>"
                + "</text>"
                + "<text key='key2'> <context>context2</context>"
                + "  <value lang='de' status='special'>masterValue2\u12AB</value>"
-               + "  <value lang='fr' status='initial'>value2���</value>"
+               + "  <value lang='fr' status='initial'>value2äöü</value>"
                + "</text>"
                + "<text key='key3'> <context>context3</context>"
                + "<!-- test comment -->"
                + "  <value lang='de' status='special'>masterValue3\u12AB</value>"
-               + "  <value lang='fr' status='initial'>value3���</value>"
+               + "  <value lang='fr' status='initial'>value3äöü</value>"
                + "</text>"
                + "</trema>", false);
 
@@ -67,7 +69,7 @@ public class TestXMLDatabase {
 
         // French
         valueNode = textNode.getValueNode("fr");
-        Assert.assertEquals("value" + j + "���", valueNode.getValue());
+        Assert.assertEquals("value" + j + "äöü", valueNode.getValue());
         Assert.assertTrue(Status.INITIAL == valueNode.getStatus());
 
         // inexisting language
@@ -77,35 +79,35 @@ public class TestXMLDatabase {
   }
 
   /**
-   * Test to read ��� characters from an UTF8 file.
+   * Test to read öäü characters from an UTF8 file.
    *
    * @throws Exception incase the test fails
    */
   @Test
   public void testUTF8() throws Exception {
-    XMLDatabase db = new XMLDatabase();
-    db.build(new FileInputStream(TestConstants.TEST_UTF8_PATHNAME), false);
+      XMLDatabase db = new XMLDatabase();
+      db.build(Files.toString(new File(ConstantsTest.TEST_UTF8_PATHNAME), Charsets.UTF_8), false);
 
-    ITextNode textNode = db.getTextNode(TEST_KEY);
-    IValueNode valueNode = textNode.getValueNode(TEST_LANGUAGE);
+      ITextNode textNode = db.getTextNode(TEST_KEY);
+      IValueNode valueNode = textNode.getValueNode(TEST_LANGUAGE);
 
-    Assert.assertEquals(TEST_UTF8_VALUE, valueNode.getValue());
+      Assert.assertThat(valueNode.getValue(), is(TEST_UTF8_VALUE));
   }
 
   /**
-   * Test to read ��� characters from an ISO file.
+   * Test to read äöü characters from an ISO file.
    *
    * @throws Exception incase the test fails
    */
   @Test
   public void testISO() throws Exception {
-    XMLDatabase db = new XMLDatabase();
-    db.build(new FileInputStream(TestConstants.TEST_ISO_PATHNAME), false);
+      XMLDatabase db = new XMLDatabase();
+      db.build(Files.toString(new File(ConstantsTest.TEST_ISO_PATHNAME), Charsets.ISO_8859_1), false);
 
-    ITextNode textNode = db.getTextNode(TEST_KEY);
-    IValueNode valueNode = textNode.getValueNode(TEST_LANGUAGE);
+      ITextNode textNode = db.getTextNode(TEST_KEY);
+      IValueNode valueNode = textNode.getValueNode(TEST_LANGUAGE);
 
-    Assert.assertEquals(TEST_ISO_VALUE, valueNode.getValue());
+      Assert.assertThat(valueNode.getValue(), is(TEST_ISO_VALUE));
   }
 
   /**
@@ -117,7 +119,7 @@ public class TestXMLDatabase {
  public void testOperations() throws Exception {
    XMLDatabase db = new XMLDatabase();
    db.build("<?xml version='1.0' encoding='UTF-8'?><trema masterLang='de'>"
-            + " !-- test comment -->"
+            + "<!-- test comment -->"
             + "<text key='key1'> <context>context1</context>"
             + "</text>"
             + "<text key='key2'> <context>context2</context>"
@@ -176,9 +178,9 @@ public class TestXMLDatabase {
     try {
       d = new File("tmp");
       d.mkdir();
-      f = new File(TestConstants.TEST_HUGE_PATHNAME);
+      f = new File(ConstantsTest.TEST_HUGE_PATHNAME);
       f.createNewFile();
-      s = new FileOutputStream(TestConstants.TEST_HUGE_PATHNAME);
+      s = new FileOutputStream(ConstantsTest.TEST_HUGE_PATHNAME);
       db.writeXML(s, "UTF-8", "  ", "\n");
     } finally {
       if (s != null) {
@@ -188,7 +190,7 @@ public class TestXMLDatabase {
           // nothing to do
         }
       }
-      f = new File(TestConstants.TEST_HUGE_PATHNAME);
+      f = new File(ConstantsTest.TEST_HUGE_PATHNAME);
       f.delete();
       d = new File("tmp");
       d.delete();

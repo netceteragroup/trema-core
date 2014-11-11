@@ -8,7 +8,7 @@ import org.junit.Test;
 /**
  * Unit test for the <code>Status</code> class.
  */
-public class TestStatus {
+public class StatusTest {
 
   /**
    * Tests the Status.compareTo method.

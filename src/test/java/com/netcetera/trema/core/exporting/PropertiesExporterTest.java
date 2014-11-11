@@ -1,19 +1,14 @@
 package com.netcetera.trema.core.exporting;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Properties;
-
+import com.netcetera.trema.core.Status;
+import com.netcetera.trema.core.XMLDatabase;
+import com.netcetera.trema.core.api.IKeyValuePair;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.netcetera.trema.core.Status;
-import com.netcetera.trema.core.XMLDatabase;
-import com.netcetera.trema.core.api.IKeyValuePair;
+import java.io.File;
+import java.util.*;
 
 
 
@@ -35,8 +30,8 @@ public class PropertiesExporterTest {
     db = new XMLDatabase();
     db.build("<?xml version='1.0' encoding='UTF-8'?><trema masterLang='de'>"
         + "<text key='key2'> <context>context2</context>"
-        + "  <value lang='de' status='verified'>masterValue2���</value>"
-        + "  <value lang='fr' status='translated'>value2���</value>"
+        + "  <value lang='de' status='verified'>masterValue2öäü</value>"
+        + "  <value lang='fr' status='translated'>value2öäü</value>"
         + "</text>"
         + "<text key='key1'> <context>context1</context>"
         + "  <value lang='de' status='initial'>masterValue1\u12AB</value>"
@@ -60,7 +55,7 @@ public class PropertiesExporterTest {
   public void testGetProperties1() {
     Properties properties = exporter.getProperties(db.getTextNodes(), "fr", null);
     Assert.assertEquals("value1\u12AB", properties.getProperty("key1"));
-    Assert.assertEquals("value2���", properties.getProperty("key2"));
+    Assert.assertEquals("value2öäü", properties.getProperty("key2"));
     Assert.assertEquals("value3", properties.getProperty("key3"));
     Assert.assertNull(properties.getProperty("unexisting.key"));
   }
@@ -73,7 +68,7 @@ public class PropertiesExporterTest {
     Properties properties =
       exporter.getProperties(db.getTextNodes(), "fr", new Status[] {Status.INITIAL, Status.TRANSLATED});
     Assert.assertEquals("value1\u12AB", properties.getProperty("key1"));
-    Assert.assertEquals("value2���", properties.getProperty("key2"));
+    Assert.assertEquals("value2öäü", properties.getProperty("key2"));
     Assert.assertNull(properties.getProperty("key3"));
     Assert.assertNull(properties.getProperty("unexisting.key"));
   }
@@ -105,7 +100,7 @@ public class PropertiesExporterTest {
   public void testGetProperties5() {
     Properties properties = exporter.getProperties(db.getTextNodes(), "de", null);
     Assert.assertEquals("masterValue1\u12AB", properties.getProperty("key1"));
-    Assert.assertEquals("masterValue2���", properties.getProperty("key2"));
+    Assert.assertEquals("masterValue2öäü", properties.getProperty("key2"));
     Assert.assertEquals("masterValue3", properties.getProperty("key3"));
     Assert.assertNull(properties.getProperty("unexisting.key"));
   }

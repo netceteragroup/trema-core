@@ -1,12 +1,11 @@
 package com.netcetera.trema.core.exporting;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-
 import com.google.common.base.Joiner;
 import com.netcetera.trema.core.Status;
 import com.netcetera.trema.core.XMLDatabase;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Unit test for the <code>CSVExporter</code> class.
@@ -30,8 +29,8 @@ public class CSVExporterTest {
         + "  <value lang='fr' status='initial'>value1\u12AB</value>"
         + "</text>"
         + "<text key='key2'> <context>context2</context>"
-        + "  <value lang='de' status='verified'>masterValue2���</value>"
-        + "  <value lang='fr' status='translated'>value2���</value>"
+        + "  <value lang='de' status='verified'>masterValue2öäü</value>"
+        + "  <value lang='fr' status='translated'>value2öäü</value>"
         + "</text>"
         + "<text key='key3'> <context>context3</context>"
         + "  <value lang='de' status='special'>masterValue3</value>"
@@ -63,8 +62,8 @@ public class CSVExporterTest {
     Assert.assertEquals(5, values[2].length);
     Assert.assertEquals("key2", values[2][0]);
     Assert.assertEquals("translated", values[2][1]);
-    Assert.assertEquals("masterValue2���", values[2][2]);
-    Assert.assertEquals("value2���", values[2][3]);
+    Assert.assertEquals("masterValue2öäü", values[2][2]);
+    Assert.assertEquals("value2öäü", values[2][3]);
     Assert.assertEquals("context2", values[2][4]);
 
     // third row
@@ -100,8 +99,8 @@ public class CSVExporterTest {
     Assert.assertEquals(5, values[2].length);
     Assert.assertEquals("key2", values[2][0]);
     Assert.assertEquals("translated", values[2][1]);
-    Assert.assertEquals("masterValue2���", values[2][2]);
-    Assert.assertEquals("value2���", values[2][3]);
+    Assert.assertEquals("masterValue2öäü", values[2][2]);
+    Assert.assertEquals("value2öäü", values[2][3]);
     Assert.assertEquals("context2", values[2][4]);
   }
 
@@ -157,7 +156,7 @@ public class CSVExporterTest {
     Assert.assertEquals(4, values[2].length);
     Assert.assertEquals("key2", values[2][0]);
     Assert.assertEquals("verified", values[2][1]);
-    Assert.assertEquals("masterValue2���", values[2][2]);
+    Assert.assertEquals("masterValue2öäü", values[2][2]);
     Assert.assertEquals("context2", values[2][3]);
 
     // third row

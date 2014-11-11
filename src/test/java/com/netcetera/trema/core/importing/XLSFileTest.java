@@ -1,17 +1,16 @@
 package com.netcetera.trema.core.importing;
 
 
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.netcetera.trema.core.Status;
 import com.netcetera.trema.core.api.IImportSource;
+import org.junit.Assert;
+import org.junit.Test;
 
 
 /**
  * Test for xls file import.
  */
-public class TestXLSFile {
+public class XLSFileTest {
   /**
    * Read from xls file.
    *

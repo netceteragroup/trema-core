@@ -1,15 +1,14 @@
 package com.netcetera.trema.core.exporting;
 
-import java.io.File;
-
-import org.junit.Assert;
-import org.junit.Test;
-
+import com.netcetera.trema.core.ConstantsTest;
 import com.netcetera.trema.core.Status;
-import com.netcetera.trema.core.TestConstants;
 import com.netcetera.trema.core.XMLDatabase;
 import com.netcetera.trema.core.api.IImportSource;
 import com.netcetera.trema.core.importing.XLSFile;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.io.File;
 
 
 /**
@@ -28,7 +27,7 @@ public class XLSExporterTest {
   public void testExport() throws Exception {
 
     XMLDatabase db = new XMLDatabase();
-    db.build(TestConstants.TESTXML, false);
+    db.build(ConstantsTest.TESTXML, false);
     File output = new File("test.xls");
     XLSExporter exporter = new XLSExporter(output);
     exporter.export(db.getTextNodes(), db.getMasterLanguage(), "fr", Status.getAvailableStatus());
@@ -37,10 +36,10 @@ public class XLSExporterTest {
     Assert.assertTrue(3 == file.getKeys().length);
     Assert.assertEquals("de", file.getMasterLanguage());
     Assert.assertEquals("masterValue1\u12AB", file.getMasterValue("key1"));
-    Assert.assertEquals("masterValue2���", file.getMasterValue("key2"));
+    Assert.assertEquals("masterValue2öäü", file.getMasterValue("key2"));
     Assert.assertEquals("masterValue3", file.getMasterValue("key3"));
     Assert.assertEquals("value1\u12AB", file.getValue("key1"));
-    Assert.assertEquals("value2���", file.getValue("key2"));
+    Assert.assertEquals("value2öäü", file.getValue("key2"));
     Assert.assertEquals("value3", file.getValue("key3"));
 
     File cleanup = new File("test.xls");
@@ -61,7 +60,7 @@ public class XLSExporterTest {
   public void testExportMasterLanguage() throws Exception {
 
     XMLDatabase db = new XMLDatabase();
-    db.build(TestConstants.TESTXML, false);
+    db.build(ConstantsTest.TESTXML, false);
     File output = new File("test1.xls");
     XLSExporter exporter = new XLSExporter(output);
     exporter.export(db.getTextNodes(), db.getMasterLanguage(), "de", Status.getAvailableStatus());
@@ -73,7 +72,7 @@ public class XLSExporterTest {
     Assert.assertNull(file.getMasterValue("key2"));
     Assert.assertNull(file.getMasterValue("key3"));
     Assert.assertEquals("masterValue1\u12AB", file.getValue("key1"));
-    Assert.assertEquals("masterValue2���", file.getValue("key2"));
+    Assert.assertEquals("masterValue2öäü", file.getValue("key2"));
     Assert.assertEquals("masterValue3", file.getValue("key3"));
 
     File cleanup = new File("test1.xls");

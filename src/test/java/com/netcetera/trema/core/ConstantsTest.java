@@ -5,7 +5,7 @@ package com.netcetera.trema.core;
 /**
  * Constants used in junit tests.
  */
-public abstract class TestConstants {
+public abstract class ConstantsTest {
   
   /** Comment for <code>TEST_UTF8_PATHNAME</code>. */
   public static final String TEST_UTF8_PATHNAME = "src/test/resources/test-UTF-8.xml";
@@ -26,8 +26,8 @@ public abstract class TestConstants {
     + "  <value lang='fr' status='initial'>value1\u12AB</value>"
     + "</text>"
     + "<text key='key2'> <context>context2</context>"
-    + "  <value lang='de' status='verified'>masterValue2���</value>"
-    + "  <value lang='fr' status='translated'>value2���</value>"
+    + "  <value lang='de' status='verified'>masterValue2öäü</value>"
+    + "  <value lang='fr' status='translated'>value2öäü</value>"
     + "</text>"
     + "<text key='key3'> <context>context3</context>"
     + "  <value lang='de' status='special'>masterValue3</value>"
@@ -35,7 +35,7 @@ public abstract class TestConstants {
     + "</text>"
     + "</trema>";
   
-  private TestConstants() {
+  private ConstantsTest() {
     
   }
   

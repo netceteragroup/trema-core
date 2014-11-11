@@ -1,20 +1,19 @@
 package com.netcetera.trema.core.importing;
 
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.netcetera.trema.core.Status;
 import com.netcetera.trema.core.XMLDatabase;
 import com.netcetera.trema.core.XMLTextNode;
 import com.netcetera.trema.core.XMLValueNode;
 import com.netcetera.trema.core.api.ITextNode;
+import org.junit.Assert;
+import org.junit.Test;
 
 
 
 /**
  * Unit test for the <code>ChangesAnalyzer</code> class.
  */
-public class TestChangesAnalyzer {
+public class ChangesAnalyzerTest {
 
   /**
    * Import source without master language.

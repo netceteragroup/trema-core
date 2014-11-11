@@ -8,7 +8,7 @@ import org.junit.Test;
 /**
  * Unit test for the <code>XMLDatabase</code> class.
  */
-public class TestXSDValidation {
+public class XSDValidationTest {
 
   private static final String XSD_LOCATION = "xsi:noNamespaceSchemaLocation="
     + "\"http://software.group.nca/trema/schema/trema-1.0.xsd\"";
