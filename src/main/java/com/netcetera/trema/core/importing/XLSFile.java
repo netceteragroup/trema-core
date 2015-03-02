@@ -1,8 +1,13 @@
 package com.netcetera.trema.core.importing;
 
-import com.netcetera.trema.core.ParseException;
-import com.netcetera.trema.core.Status;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.lang.invoke.MethodHandles;
+import java.util.Hashtable;
+
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.Cell;
@@ -10,20 +15,17 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.Hashtable;
-import java.util.logging.Logger;
+import com.netcetera.trema.core.ParseException;
+import com.netcetera.trema.core.Status;
 
 /**
  * Represents a XLS text resource file.
  */
 public class XLSFile extends AbstractFile {
 
-  /** Comment for <code>SHEET_NAME</code>. */
   public static final String SHEET_NAME = "Text Resources";
-  /** Comment for <code>LOG</code>. */
-  public static final Logger LOG = Logger.getLogger(XLSFile.class.getName());
+
+  public static final Logger LOG = LogManager.getLogger(MethodHandles.lookup().lookupClass());
 
 
   private String pathName = null;
@@ -34,9 +36,9 @@ public class XLSFile extends AbstractFile {
 
   /**
    * Constructs a new CSV file from a path name.
+   *
    * @param pathName the path
-   * @throws ParseException if any parse errors ocur
-   * supported
+   * @throws ParseException if any parse errors ocur supported
    */
   public XLSFile(String pathName) throws ParseException {
     this.pathName = pathName;
@@ -57,6 +59,36 @@ public class XLSFile extends AbstractFile {
         }
       }
     }
+  }
+
+
+  /**
+   * Parses a CSV file from a given reader.
+   *
+   * @throws ParseException if any parse errors ocur
+   */
+  private void parse(Workbook ws) throws ParseException {
+    LOG.info("Parsing XLS file...");
+    Sheet sheet = ws.getSheet(SHEET_NAME);
+    if (sheet == null) {
+      sheet = ws.getSheetAt(0);
+    }
+    if (sheet == null) {
+      throw new ParseException("No sheet found");
+    }
+
+    int firstRow = sheet.getFirstRowNum();
+    int lastRow = sheet.getLastRowNum();
+    LOG.info("first row is:" + firstRow + ", last row is:" + lastRow);
+
+    // first row is expected to be the header.
+    analyzeHeader(sheet.getRow(firstRow));
+
+    for (int i = firstRow + 1; i <= lastRow; i++) {
+      Row r = sheet.getRow(i);
+      extractRowData(r, cellMap);
+    }
+    LOG.info("Parsing of XLS file finished.");
   }
 
 
@@ -110,37 +142,11 @@ public class XLSFile extends AbstractFile {
 
   private void checkForHeader(String headerName) throws ParseException {
     if (cellMap.get(headerName) == null) {
-      LOG.log(java.util.logging.Level.SEVERE, "Header row check failed, column not found, columnname:" + headerName);
+      LOG.warn("Header row check failed, column not found, columnname:" + headerName);
       throw new ParseException("Header not found in file, headername:" + headerName);
     }
   }
 
-
-  /**
-   * Parses a CSV file from a given reader.
-   * @throws ParseException if any parse errors ocur
-   */
-  private void parse(Workbook ws) throws ParseException {
-    Sheet sheet = ws.getSheet(SHEET_NAME);
-    if (sheet == null) {
-      sheet = ws.getSheetAt(0);
-    }
-    if (sheet == null) {
-      throw new ParseException("No sheet found");
-    }
-
-    int firstRow = sheet.getFirstRowNum();
-    int lastRow = sheet.getLastRowNum();
-    LOG.info("first row is:" + firstRow + ", last row is:" + lastRow);
-
-    //first row is expected to be the header.
-    analyzeHeader(sheet.getRow(firstRow));
-
-    for (int i = firstRow + 1; i <= lastRow; i++) {
-      Row r = sheet.getRow(i);
-      extractRowData(r, cellMap);
-    }
-  }
 
   private void extractRowData(Row r, Hashtable<String, Integer> cellmap) throws ParseException {
     if (r == null) {
@@ -175,7 +181,8 @@ public class XLSFile extends AbstractFile {
     add(keyStr, Status.valueOf(statusStr), masterStr, valueStr);
   }
 
-  private String extractCellValue(Cell cell, int rowNumber, String columnType) throws ParseException {
+  private String extractCellValue(Cell cell, int rowNumber, String columnType)
+      throws ParseException {
     if (cell == null) {
       throw new ParseException(
           "Cell is null, rownumber:" + rowNumber + ", columntype:" + columnType);
@@ -211,6 +218,7 @@ public class XLSFile extends AbstractFile {
 
   /**
    * Gets the pathname of this CSV file.
+   *
    * @return the pathname of this CSV file.
    */
   public String getPathname() {
@@ -228,6 +236,7 @@ public class XLSFile extends AbstractFile {
   public String getLanguage() {
     return language;
   }
+
   /**
    * {@inheritDoc}
    */

@@ -4,9 +4,12 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.Cell;
@@ -27,29 +30,32 @@ import com.netcetera.trema.core.importing.XLSFile;
  */
 public class XLSExporter extends AbstractSpreadSheetExporter {
 
+  public static final Logger LOG = LogManager.getLogger(MethodHandles.lookup().lookupClass());
+
   private File outputfile;
   private static final int COLUMNWIDTH = 256 * 20;
 
   /**
    * Constructor.
-   * 
+   *
    * @param outputfile the output file
    */
   public XLSExporter(File outputfile) {
     this.outputfile = outputfile;
   }
-  
+
   /**
    * For unittests.
    */
   public XLSExporter() {
-    
+
   }
 
   /** {@inheritDoc} */
   @Override
-  public void export(ITextNode [] nodes, String masterlanguage, String language, Status[] states) 
+  public void export(ITextNode [] nodes, String masterlanguage, String language, Status[] states)
   throws ExportException {
+    LOG.info("Exporting XLS file...");
     Workbook wb = new HSSFWorkbook();
     Map<String, CellStyle> styles = createStyles(wb);
     Sheet sheet = wb.createSheet(XLSFile.SHEET_NAME);
@@ -65,7 +71,7 @@ public class XLSExporter extends AbstractSpreadSheetExporter {
     sheet.setAutobreaks(true);
     printSetup.setFitHeight((short) 1);
     printSetup.setFitWidth((short) 1);
-    
+
     String [][] values = getValues(nodes, masterlanguage, language, states);
 
     Row headerRow = sheet.createRow(0);
@@ -108,12 +114,13 @@ public class XLSExporter extends AbstractSpreadSheetExporter {
         } catch (IOException e) {
           // ignore
         }
-    } 
+    }
+    LOG.info("Exporting of XLS file finished.");
   }
 
 
   /**
-   * Cell styles used. 
+   * Cell styles used.
    */
   private static Map<String, CellStyle> createStyles(Workbook wb) {
     Map<String, CellStyle> styles = new HashMap<String, CellStyle>();

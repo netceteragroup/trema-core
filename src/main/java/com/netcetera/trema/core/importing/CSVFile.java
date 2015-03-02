@@ -5,19 +5,24 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
+import java.lang.invoke.MethodHandles;
 import java.util.List;
-import com.netcetera.trema.core.ParseException;
-import com.netcetera.trema.core.Status;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import com.netcetera.trema.core.ParseException;
+import com.netcetera.trema.core.Status;
 
 /**
  * Represents a CSV text resource file.
  */
 public class CSVFile extends AbstractFile {
+
+  public static final Logger LOG = LogManager.getLogger(MethodHandles.lookup().lookupClass());
 
   /** Error message if a wrong header format is encountered. */
   private static final String WRONG_HEADER_ERROR_MESSAGE =
@@ -42,9 +47,7 @@ public class CSVFile extends AbstractFile {
    * @param pathName the path
    * @param encoding the encoding of the file
    * @param separator the CSV separator used in the file
-   * @throws ParseException if any parse errors ocur
-   * @throws UnsupportedEncodingException if the given encoding is not
-   * supported
+   * @throws ParseException if any parse errors occurs
    * @throws IOException if any I/O errors occur
    */
   public CSVFile(String pathName, String encoding, char separator) throws ParseException, IOException {
@@ -73,6 +76,7 @@ public class CSVFile extends AbstractFile {
    * @throws IOException if any IO errors occur
    */
   private void parse(Reader reader, char separator) throws IOException, ParseException {
+    LOG.info("Parsing CSV file...");
     /*
      * Ideally one would configure the format using withHeader(String ...) but since the master column is optional
      * this is of no use. Therefore, you'll get null if you were to call getHeaderMap() later on the parser. The header
@@ -106,6 +110,7 @@ public class CSVFile extends AbstractFile {
       // the context is irrelevant, so it is not added
       add(key, status, masterValue, value);
     }
+    LOG.info("Parsing of CSV file finished.");
   }
 
   private String[] transformHeaderMapToArray(CSVRecord headerRecord) {
@@ -136,7 +141,8 @@ public class CSVFile extends AbstractFile {
     }
   }
 
-  private void verifyHeaderColumnStartsWith(String[] header, int index, String expectedHaderNamePrefix) throws ParseException {
+  private void verifyHeaderColumnStartsWith(String[] header, int index, String expectedHaderNamePrefix)
+      throws ParseException {
     if (!hasHeaderColumnStartingWith(header, index, expectedHaderNamePrefix)) {
       throwWrongHeaderException();
     }

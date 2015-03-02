@@ -1,5 +1,17 @@
 package com.netcetera.trema.core.exporting;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.lang.invoke.MethodHandles;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.Properties;
+import java.util.TreeSet;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.netcetera.trema.common.TremaCoreUtil;
 import com.netcetera.trema.core.Status;
 import com.netcetera.trema.core.api.IExportFilter;
@@ -8,20 +20,14 @@ import com.netcetera.trema.core.api.IKeyValuePair;
 import com.netcetera.trema.core.api.ITextNode;
 import com.netcetera.trema.core.api.IValueNode;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.Properties;
-import java.util.TreeSet;
-
 
 
 /**
  * Exports an <code>IDatabase</code> to a Java ".properties" file.
  */
 public class PropertiesExporter implements IExporter {
+
+  public static final Logger LOG = LogManager.getLogger(MethodHandles.lookup().lookupClass());
 
   private final File outputFile;
   private final OutputStreamFactory outputStreamFactory;
@@ -77,6 +83,7 @@ public class PropertiesExporter implements IExporter {
   @Override
   public void export(ITextNode[] nodes, String masterlanguage, String language, Status[] states)
       throws ExportException {
+    LOG.info("Exporting properties file...");
     try (OutputStream outputStream = outputStreamFactory.createOutputStream(outputFile)) {
       String header = "Generated file - do not edit";
       SortedProperties props = getProperties(nodes, language, states);
@@ -84,6 +91,7 @@ public class PropertiesExporter implements IExporter {
     } catch (IOException e) {
       throw new ExportException("Could not store properties:" + e.getMessage());
     }
+    LOG.info("Exporting of properties file finished.");
   }
 
   /**

@@ -5,9 +5,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.netcetera.trema.common.TremaCoreUtil;
 import com.netcetera.trema.core.Status;
@@ -22,6 +26,8 @@ import com.netcetera.trema.core.api.IValueNode;
  * Exports an <code>IDatabase</code> to a Android "strings.xml" file.
  */
 public class AndroidExporter implements IExporter {
+
+  public static final Logger LOG = LogManager.getLogger(MethodHandles.lookup().lookupClass());
 
   private final File outputFile;
   private final OutputStreamFactory outputStreamFactory;
@@ -61,6 +67,7 @@ public class AndroidExporter implements IExporter {
   @Override
   public void export(ITextNode[] nodes, String masterlanguage, String language, Status[] states)
       throws ExportException {
+    LOG.info("Exporting Android XML file...");
     try (OutputStream outputStream = outputStreamFactory.createOutputStream(outputFile);
          BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8"))) {
       synchronized (this) {
@@ -112,6 +119,7 @@ public class AndroidExporter implements IExporter {
     } catch (IOException e) {
       throw new ExportException("Could not store properties:" + e.getMessage());
     }
+    LOG.info("Exporting of Android XML file finished.");
   }
 
   /**

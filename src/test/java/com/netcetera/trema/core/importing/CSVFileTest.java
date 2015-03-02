@@ -1,11 +1,12 @@
 package com.netcetera.trema.core.importing;
 
-import com.netcetera.trema.core.ParseException;
-import com.netcetera.trema.core.Status;
+import java.io.StringReader;
+
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.StringReader;
+import com.netcetera.trema.core.ParseException;
+import com.netcetera.trema.core.Status;
 
 
 /**
@@ -82,6 +83,7 @@ public class CSVFileTest {
    *
    * @throws Exception in case the test fails
    */
+  @SuppressWarnings("unused")
   @Test
   public void testInvalidHeader() throws Exception {
     try {
@@ -167,6 +169,7 @@ public class CSVFileTest {
    *
    * @throws Exception in case the test fails
    */
+  @SuppressWarnings("unused")
   @Test
   public void testInvalidRows() throws Exception {
     try {

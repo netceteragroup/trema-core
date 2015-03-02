@@ -1,5 +1,17 @@
 package com.netcetera.trema.core.exporting;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.lang.invoke.MethodHandles;
+import java.nio.charset.Charset;
+import java.util.Map.Entry;
+import java.util.SortedMap;
+import java.util.TreeMap;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.netcetera.trema.common.TremaCoreUtil;
 import com.netcetera.trema.core.Status;
 import com.netcetera.trema.core.api.IExportFilter;
@@ -8,18 +20,13 @@ import com.netcetera.trema.core.api.IKeyValuePair;
 import com.netcetera.trema.core.api.ITextNode;
 import com.netcetera.trema.core.api.IValueNode;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.charset.Charset;
-import java.util.Map.Entry;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
 /**
  * Exporter for the JSON format.
  */
 public class JsonExporter implements IExporter {
+
+  public static final Logger LOG = LogManager.getLogger(MethodHandles.lookup().lookupClass());
+
   private static final Charset UTF_8 = Charset.forName("UTF-8");
 
   private final File outputFile;
@@ -89,6 +96,7 @@ public class JsonExporter implements IExporter {
   @Override
   public void export(ITextNode[] nodes, String masterLanguage, String language, Status[] states)
       throws ExportException {
+    LOG.info("Exporting JSON file...");
     SortedMap<String, String> props = getProperties(nodes, language, states);
     String jsonString = toJsonString(props);
     try (OutputStream outputStream = outputStreamFactory.createOutputStream(outputFile)) {
@@ -96,6 +104,7 @@ public class JsonExporter implements IExporter {
     } catch (IOException e) {
       throw new ExportException("Could not write json:" + e.getMessage());
     }
+    LOG.info("Exporting of JSON file finished.");
   }
 
   private String toJsonString(SortedMap<String, String> props) {
