@@ -23,7 +23,7 @@ import java.util.TreeMap;
  */
 public final class Status implements Comparable<Status> {
 
-  /** This map holds the only instances of this class, one per status.
+  /** This map holds the only INSTANCES of this class, one per status.
    *  We use a sorted map with the positions as keys to ease getting
    *  all the available status in ascending order and to make
    *  <code>valueOf(Integer)</code> perform in constant time. On the
@@ -31,7 +31,7 @@ public final class Status implements Comparable<Status> {
    *  <code>valueOf(String)</code> method, which, however, is not a big
    *  performance penalty since the number of available status is
    *  small. */
-  private static final SortedMap<Integer, Status> instances = new TreeMap<>();
+  private static final SortedMap<Integer, Status> INSTANCES = new TreeMap<>();
 
   /** Status "initial". */
   public static final Status INITIAL = new Status("initial", 0);
@@ -55,7 +55,7 @@ public final class Status implements Comparable<Status> {
   private Status(final String name, final int position) {
     this.position = position;
     this.name = name;
-    instances.put(position, this);
+    INSTANCES.put(position, this);
   }
 
   /**
@@ -111,7 +111,7 @@ public final class Status implements Comparable<Status> {
     if (name == null) {
       return UNDEFINED;
     }
-    for (Status status : instances.values()) {
+    for (Status status : INSTANCES.values()) {
       if (name.equals(status.getName())) {
         return status;
       }
@@ -127,7 +127,7 @@ public final class Status implements Comparable<Status> {
    * @return the status or <code>null</code> if the conversion fails.
    */
   public static Status valueOf(Integer position) {
-    return instances.get(position);
+    return INSTANCES.get(position);
   }
 
   /**
@@ -135,7 +135,7 @@ public final class Status implements Comparable<Status> {
    * @return the available status in ascending order.
    */
   public static Status[] getAvailableStatus() {
-    return instances.values().toArray(new Status[instances.size()]);
+    return INSTANCES.values().toArray(new Status[INSTANCES.size()]);
   }
 
   /**
@@ -146,7 +146,7 @@ public final class Status implements Comparable<Status> {
    */
   public static String[] getAvailableStatusNames() {
     List<String> nameList = new ArrayList<>();
-    for (Status status : instances.values()) {
+    for (Status status : INSTANCES.values()) {
       nameList.add(status.getName());
     }
     return nameList.toArray(new String[nameList.size()]);
