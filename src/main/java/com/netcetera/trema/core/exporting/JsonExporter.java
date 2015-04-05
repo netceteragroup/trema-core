@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -113,7 +114,7 @@ public class JsonExporter implements IExporter {
     if (!props.isEmpty()) {
       final String lastKey = props.lastKey();
       for (Entry<String, String> entry : props.entrySet()) {
-        sb = sb.append("\t\"").append(entry.getKey()).append('"').append(": \"").append(entry.getValue());
+        sb = sb.append("\t\"").append(entry.getKey()).append('"').append(": \"").append(escape(entry.getValue()));
         if (!entry.getKey().equals(lastKey)) {
           sb = sb.append("\",\n");
         } else {
@@ -124,4 +125,9 @@ public class JsonExporter implements IExporter {
     sb.append("}");
     return sb.toString();
   }
+
+  private String escape(String in) {
+    return StringUtils.replace(in, "\n", "\\n");
+  }
+
 }

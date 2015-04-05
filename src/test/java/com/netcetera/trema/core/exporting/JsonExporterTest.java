@@ -58,6 +58,10 @@ public class JsonExporterTest {
             + "<context/>"
             + "<value lang=\"en\" status=\"initial\">Test</value>"
             + "</text>"
+            + "<text key=\"com.netcetera.angular.translation.multiline\">"
+            + "<context/>"
+            + "<value lang=\"en\" status=\"initial\">\n  first line\n  second line\n  third line\n</value>"
+            + "</text>"
             + "</trema>", false
     );
     file = Mockito.mock(File.class);
@@ -75,7 +79,7 @@ public class JsonExporterTest {
 
 
     Assert.assertEquals(3, mapDE.size());
-    Assert.assertEquals(4, mapEN.size());
+    Assert.assertEquals(5, mapEN.size());
   }
 
   @Test
@@ -86,7 +90,7 @@ public class JsonExporterTest {
     SortedMap<String, String> mapEN = exporter.getProperties(nodes, "en", null);
 
     Assert.assertEquals(3, mapDE.size());
-    Assert.assertEquals(4, mapEN.size());
+    Assert.assertEquals(5, mapEN.size());
   }
 
   @Test
@@ -110,7 +114,7 @@ public class JsonExporterTest {
 
     exporter.getProperties(nodes, "en", states);
 
-    Mockito.verify(filter, Mockito.times(4)).filter(Matchers.any(IKeyValuePair.class));
+    Mockito.verify(filter, Mockito.times(5)).filter(Matchers.any(IKeyValuePair.class));
     Mockito.verifyNoMoreInteractions(filter);
   }
 
@@ -130,11 +134,13 @@ public class JsonExporterTest {
     String jsonString = "{"
         + "\n\t\"com.netcetera.angular.translation.language.de\": \"German\","
         + "\n\t\"com.netcetera.angular.translation.language.en\": \"English\","
+        + "\n\t\"com.netcetera.angular.translation.multiline\": \"\\n  first line\\n  second line\\n  third line\\n\","
         + "\n\t\"com.netcetera.angular.translation.test\": \"Test\","
         + "\n\t\"com.netcetera.angular.translation.title\": \"Hello World\""
         + "\n}";
     inOrder.verify(os).write(jsonString.getBytes("UTF-8"));
     inOrder.verify(os).close();
+
     Mockito.verifyNoMoreInteractions(os, factory);
   }
 
