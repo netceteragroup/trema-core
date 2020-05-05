@@ -1,11 +1,17 @@
 package com.netcetera.trema.core.importing;
 
+import com.google.common.collect.ImmutableMap;
 import com.netcetera.trema.core.Status;
 import com.netcetera.trema.core.XMLDatabase;
 import com.netcetera.trema.core.XMLTextNode;
 import com.netcetera.trema.core.XMLValueNode;
 import com.netcetera.trema.core.api.ITextNode;
 import org.junit.jupiter.api.Test;
+
+import java.util.Arrays;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.arrayWithSize;
@@ -67,9 +73,16 @@ class ChangesAnalyzerTest {
   
     assertThat(conflictingChanges, arrayWithSize(5));
     assertThat(nonConflictingChanges, arrayWithSize(3));
-    
-    checkChangeTypes(conflictingChanges, nonConflictingChanges,
-        1, 1, 1, 1, 0, 0, 3, 1);    
+
+    Map<Integer, Long> expectedChangeCounts = ImmutableMap.<Integer, Long>builder()
+      .put(Change.TYPE_KEY_ADDITION, 1L)
+      .put(Change.TYPE_IMPORTED_STATUS_NEWER, 1L)
+      .put(Change.TYPE_IMPORTED_STATUS_OLDER, 1L)
+      .put(Change.TYPE_LANGUAGE_ADDITION, 1L)
+      .put(Change.TYPE_VALUE_AND_STATUS_CHANGED, 3L)
+      .put(Change.TYPE_VALUE_CHANGED, 1L)
+      .build();
+    verifyNumberOfChanges(analyzer, expectedChangeCounts);
   }
   
   /**
@@ -120,68 +133,30 @@ class ChangesAnalyzerTest {
 
     assertThat(conflictingChanges, arrayWithSize(5));
     assertThat(nonConflictingChanges, arrayWithSize(2));
-    
-    checkChangeTypes(conflictingChanges, nonConflictingChanges,
-        1, 1, 0, 1, 1, 1, 2, 0);    
+
+    Map<Integer, Long> expectedChangeCounts = ImmutableMap.<Integer, Long>builder()
+      .put(Change.TYPE_KEY_ADDITION, 1L)
+      .put(Change.TYPE_IMPORTED_STATUS_NEWER, 1L)
+      .put(Change.TYPE_LANGUAGE_ADDITION, 1L)
+      .put(Change.TYPE_MASTER_LANGUAGE_ADDITION, 1L)
+      .put(Change.TYPE_MASTER_VALUE_CHANGED, 1L)
+      .put(Change.TYPE_VALUE_AND_STATUS_CHANGED, 2L)
+      .build();
+    verifyNumberOfChanges(analyzer, expectedChangeCounts);
   }
 
   /**
-   * Checks the types of the changes and compares them with an expected
-   * number.
-   * 
-   *  
+   * Verifies that the given changes analyzer has the expected number of changes by change type.
+   *
+   * @param analyzer the analyzer whose found changes should be verified
+   * @param expectedCountByChangeType expected count by change type (use Change constants)
    */
-  // tzueblin Dec 1, 2008: Suppress checkstyle, this method has more than 7 args but its ok here, 
-  // however its a unittest   
-  
-  // CHECKSTYLE:OFF
-  private void checkChangeTypes(Change[] conflictingChanges, Change[] nonConflictingChanges,
-      int additionCount,
-      int statusNewerCount,
-      int statusOlderCount,
-      int languageAdditionCount,
-      int masterLanguageAdditionCount,
-      int masterValueChangedCount,
-      int valueAndStatusChangedCount,
-      int valueChangedCount) {
-    // CHECKSTYLE:ON
-    
-    int addition = 0;
-    int statusNewer = 0;
-    int statusOlder = 0;
-    int languageAddition = 0;
-    int masterLanguageAddition = 0;
-    int masterValueChanged = 0;
-    int valueAndStatusChanged = 0;
-    int valueChanged = 0;
-    
-    Change[] allChanges = new Change[conflictingChanges.length + nonConflictingChanges.length];
-    
-    System.arraycopy(conflictingChanges, 0, allChanges, 0, conflictingChanges.length);
-    System.arraycopy(nonConflictingChanges, 0, allChanges, conflictingChanges.length, nonConflictingChanges.length);
-    
-    for (int i = 0; i < allChanges.length; i++) {
-      switch (allChanges[i].getType()) {
-        case Change.TYPE_KEY_ADDITION: addition++; break;
-        case Change.TYPE_IMPORTED_STATUS_NEWER: statusNewer++; break;
-        case Change.TYPE_IMPORTED_STATUS_OLDER: statusOlder++; break;
-        case Change.TYPE_LANGUAGE_ADDITION: languageAddition++; break;
-        case Change.TYPE_MASTER_LANGUAGE_ADDITION: masterLanguageAddition++; break;
-        case Change.TYPE_MASTER_VALUE_CHANGED: masterValueChanged++; break;
-        case Change.TYPE_VALUE_AND_STATUS_CHANGED: valueAndStatusChanged++; break;
-        case Change.TYPE_VALUE_CHANGED: valueChanged++; break;
-        default: // do nothing
-      }
-    }
-    
-    assertThat(addition, equalTo(additionCount));
-    assertThat(statusNewer, equalTo(statusNewerCount));
-    assertThat(statusOlder, equalTo(statusOlderCount));
-    assertThat(languageAddition, equalTo(languageAdditionCount));
-    assertThat(masterLanguageAddition, equalTo(masterLanguageAdditionCount));
-    assertThat(masterValueChanged, equalTo(masterValueChangedCount));
-    assertThat(valueAndStatusChanged, equalTo(valueAndStatusChangedCount));
-    assertThat(valueChanged, equalTo(valueChangedCount));
+  private void verifyNumberOfChanges(ChangesAnalyzer analyzer, Map<Integer, Long> expectedCountByChangeType) {
+    Map<Integer, Long> actualCountByChangeType =
+      Stream.of(analyzer.getConflictingChanges(), analyzer.getNonConflictingChanges())
+        .flatMap(Arrays::stream)
+        .collect(Collectors.groupingBy(Change::getType, Collectors.counting()));
+
+    assertThat(actualCountByChangeType, equalTo(expectedCountByChangeType));
   }
-  
 }

@@ -29,11 +29,10 @@ class CSVFileTest {
    */
   @Test
   void testValidFile1() throws Exception {
-    StringBuilder contents = new StringBuilder();
-    contents.append("Key;Status;Master (de);Value (fr);Context" + CRLF);
-    contents.append("key1;initial;masterValue1;value1öäü;context1" + CRLF);
-    contents.append("key2;translated;masterValue2;value2;context2");
-    CSVFile csvFile = new CSVFile(new StringReader(contents.toString()), ';');
+    String contents = "Key;Status;Master (de);Value (fr);Context"
+      + CRLF + "key1;initial;masterValue1;value1öäü;context1"
+      + CRLF + "key2;translated;masterValue2;value2;context2";
+    CSVFile csvFile = new CSVFile(new StringReader(contents), ';');
 
     assertThat(csvFile.hasMasterLanguage(), equalTo(true));
     assertThat(csvFile.getSize(), equalTo(2));
@@ -59,11 +58,10 @@ class CSVFileTest {
    */
   @Test
   void testValidFile2() throws Exception {
-    StringBuilder contents = new StringBuilder();
-    contents.append("Key;Status;Value (de);Context" + CRLF);
-    contents.append("key1;initial;masterValue1;context1" + CRLF);
-    contents.append("key2;translated;masterValue2;context2");
-    CSVFile csvFile = new CSVFile(new StringReader(contents.toString()), ';');
+    String contents = "Key;Status;Value (de);Context"
+      + CRLF + "key1;initial;masterValue1;context1"
+      + CRLF + "key2;translated;masterValue2;context2";
+    CSVFile csvFile = new CSVFile(new StringReader(contents), ';');
 
     assertThat(csvFile.hasMasterLanguage(), equalTo(false));
     assertThat(csvFile.getSize(), equalTo(2));

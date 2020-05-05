@@ -1,14 +1,16 @@
 package com.netcetera.trema.core;
 
-import com.google.common.io.Files;
+import com.netcetera.trema.TestUtils;
 import com.netcetera.trema.core.api.ITextNode;
 import com.netcetera.trema.core.api.IValueNode;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.arrayContaining;
@@ -79,42 +81,42 @@ class XMLDatabaseTest {
     }
   }
 
-  /**
-   * Test to read öäü characters from an UTF8 file.
-   *
-   * @throws Exception incase the test fails
-   */
   @Test
-  void testUTF8() throws Exception {
+  void shouldReadFromUtf8FileProperly() throws Exception {
+    // given
     XMLDatabase db = new XMLDatabase();
-    db.build(Files.toString(new File(ConstantsTest.TEST_UTF8_PATHNAME), StandardCharsets.UTF_8), false);
+    Path utf8TestFile = TestUtils.getFileFromJar("/test-UTF-8.xml");
+    String contents = new String(Files.readAllBytes(utf8TestFile), StandardCharsets.UTF_8);
 
+    // when
+    db.build(contents, false);
+
+    // then
     ITextNode textNode = db.getTextNode(TEST_KEY);
     IValueNode valueNode = textNode.getValueNode(TEST_LANGUAGE);
-
     assertThat(valueNode.getValue(), equalTo(TEST_UTF8_VALUE));
   }
 
-  /**
-   * Test to read äöü characters from an ISO file.
-   *
-   * @throws Exception incase the test fails
-   */
   @Test
-  void testISO() throws Exception {
+  void shouldReadFromIso88591FileProperly() throws Exception {
+    // given
     XMLDatabase db = new XMLDatabase();
-    db.build(Files.toString(new File(ConstantsTest.TEST_ISO_PATHNAME), StandardCharsets.ISO_8859_1), false);
+    Path iso88591TestFile = TestUtils.getFileFromJar("/test-ISO.xml");
+    String contents = new String(Files.readAllBytes(iso88591TestFile), StandardCharsets.ISO_8859_1);
 
+    // when
+    db.build(contents, false);
+
+    // then
     ITextNode textNode = db.getTextNode(TEST_KEY);
     IValueNode valueNode = textNode.getValueNode(TEST_LANGUAGE);
-
     assertThat(valueNode.getValue(), equalTo(TEST_ISO_VALUE));
   }
 
   /**
    * Tests the operations available on nodes (move etc.).
    *
-   * @throws Exception incase the test fails
+   * @throws Exception in case the test fails
    */
   @Test
   void testOperations() throws Exception {
@@ -155,13 +157,11 @@ class XMLDatabaseTest {
     assertThat(db.getSize(), equalTo(0));
  }
 
-  /**
+  /*
    * This tests tries to write a big xml file to disk.
-   *
-   * @throws Exception in case the test fails
    */
   @Test
-  void testCreateHugeDatabase() throws Exception {
+  void testCreateLargeDatabase(@TempDir Path tempDirectory) throws Exception {
     XMLDatabase db = new XMLDatabase();
     db.setMasterLanguage("de");
 
@@ -173,21 +173,10 @@ class XMLDatabaseTest {
       textNode.addValueNode(new XMLValueNode("it", Status.INITIAL, "value_it" + i));
       db.addTextNode(textNode);
     }
-    File d = null;
-    File f = null;
-    FileOutputStream s = null;
-    try {
-      d = new File("tmp");
-      d.mkdir();
-      f = new File(ConstantsTest.TEST_HUGE_PATHNAME);
-      f.createNewFile();
-      s = new FileOutputStream(ConstantsTest.TEST_HUGE_PATHNAME);
-      db.writeXML(s, "UTF-8", "  ", "\n");
-    } finally {
-      f = new File(ConstantsTest.TEST_HUGE_PATHNAME);
-      f.delete();
-      d = new File("tmp");
-      d.delete();
+
+    File file = tempDirectory.resolve("largeFile.xml").toFile();
+    try (FileOutputStream fis = new FileOutputStream(file)) {
+      db.writeXML(fis, "UTF-8", "  ", "\n");
     }
   }
 }
