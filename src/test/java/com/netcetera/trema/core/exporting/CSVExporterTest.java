@@ -1,29 +1,27 @@
 package com.netcetera.trema.core.exporting;
 
-import com.google.common.base.Joiner;
 import com.netcetera.trema.core.Status;
 import com.netcetera.trema.core.XMLDatabase;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.arrayContaining;
+import static org.hamcrest.Matchers.arrayWithSize;
 
 /**
- * Unit test for the <code>CSVExporter</code> class.
+ * Unit test for {@link CSVExporter}.
  */
 public class CSVExporterTest {
 
   private final CSVExporter exporter = new CSVExporter();
   private XMLDatabase db;
 
-  /**
-   * setUp().
-   * @throws Exception in case setUp fails
-   */
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     db = new XMLDatabase();
     db.build(
-          "<?xml version='1.0' encoding='UTF-8'?><trema masterLang='de'>"
+      "<?xml version='1.0' encoding='UTF-8'?><trema masterLang='de'>"
         + "<text key='key1'> <context>context1</context>"
         + "  <value lang='de' status='initial'>masterValue1\u12AB</value>"
         + "  <value lang='fr' status='initial'>value1\u12AB</value>"
@@ -43,132 +41,81 @@ public class CSVExporterTest {
    * Tests CSVExporter. Export French with all status.
    */
   @Test
-  public void testGetValues1() {
+  public void shouldExportAllValuesOfLanguage() {
+    // given / when
     String[][] values = exporter.getValues(db.getTextNodes(), db.getMasterLanguage(), "fr", null);
-    Assert.assertEquals(4, values.length);
+
+    // then
+    assertThat(values, arrayWithSize(4));
 
     // header
-    Assert.assertEquals("Key;Status;Master (de);Value (fr);Context", arrayToList(values));
-
-    // first row
-    Assert.assertEquals(5, values[1].length);
-    Assert.assertEquals("key1", values[1][0]);
-    Assert.assertEquals("initial", values[1][1]);
-    Assert.assertEquals("masterValue1\u12AB", values[1][2]);
-    Assert.assertEquals("value1\u12AB", values[1][3]);
-    Assert.assertEquals("context1", values[1][4]);
-
-    // second row
-    Assert.assertEquals(5, values[2].length);
-    Assert.assertEquals("key2", values[2][0]);
-    Assert.assertEquals("translated", values[2][1]);
-    Assert.assertEquals("masterValue2öäü", values[2][2]);
-    Assert.assertEquals("value2öäü", values[2][3]);
-    Assert.assertEquals("context2", values[2][4]);
-
-    // third row
-    Assert.assertEquals(5, values[3].length);
-    Assert.assertEquals("key3", values[3][0]);
-    Assert.assertEquals("special", values[3][1]);
-    Assert.assertEquals("masterValue3", values[3][2]);
-    Assert.assertEquals("value3", values[3][3]);
-    Assert.assertEquals("context3", values[3][4]);
+    assertThat(values[0], arrayContaining("Key", "Status", "Master (de)", "Value (fr)", "Context"));
+    // text rows
+    assertThat(values[1], arrayContaining("key1", "initial", "masterValue1\u12AB", "value1\u12AB", "context1"));
+    assertThat(values[2], arrayContaining("key2", "translated", "masterValue2öäü", "value2öäü", "context2"));
+    assertThat(values[3], arrayContaining("key3", "special", "masterValue3", "value3", "context3"));
   }
 
   /**
    * Tests CSVExporter. Export French, status "initial" and "translated"
    */
   @Test
-  public void testGetValues2() {
+  public void shouldExportLanguageAndFilterByStatus() {
+    // given / when
     String[][] values = exporter.getValues(
-        db.getTextNodes(), db.getMasterLanguage(), "fr", new Status[] {Status.INITIAL, Status.TRANSLATED});
-    Assert.assertEquals(3, values.length);
+      db.getTextNodes(), db.getMasterLanguage(), "fr", new Status[]{Status.INITIAL, Status.TRANSLATED});
 
-    // header
-    Assert.assertEquals("Key;Status;Master (de);Value (fr);Context", arrayToList(values));
-
-    // first row
-    Assert.assertEquals(5, values[1].length);
-    Assert.assertEquals("key1", values[1][0]);
-    Assert.assertEquals("initial", values[1][1]);
-    Assert.assertEquals("masterValue1\u12AB", values[1][2]);
-    Assert.assertEquals("value1\u12AB", values[1][3]);
-    Assert.assertEquals("context1", values[1][4]);
-
-    // second row
-    Assert.assertEquals(5, values[2].length);
-    Assert.assertEquals("key2", values[2][0]);
-    Assert.assertEquals("translated", values[2][1]);
-    Assert.assertEquals("masterValue2öäü", values[2][2]);
-    Assert.assertEquals("value2öäü", values[2][3]);
-    Assert.assertEquals("context2", values[2][4]);
+    // then
+    assertThat(values, arrayWithSize(3));
+    assertThat(values[0], arrayContaining("Key", "Status", "Master (de)", "Value (fr)", "Context"));
+    assertThat(values[1], arrayContaining("key1", "initial", "masterValue1\u12AB", "value1\u12AB", "context1"));
+    assertThat(values[2], arrayContaining("key2", "translated", "masterValue2öäü", "value2öäü", "context2"));
   }
 
   /**
    * Tests CSVExporter. Export French, only status "initial".
    */
   @Test
-  public void testGetValues4() {
+  public void shouldExportByLanguageAndStatus() {
+    // given / when
     String[][] values = exporter.getValues(
-        db.getTextNodes(), db.getMasterLanguage(), "fr", new Status[] {Status.INITIAL});
-    Assert.assertEquals(2, values.length);
+      db.getTextNodes(), db.getMasterLanguage(), "fr", new Status[]{Status.INITIAL});
 
-    // header
-    Assert.assertEquals("Key;Status;Master (de);Value (fr);Context", arrayToList(values));
-
-    // first row
-    Assert.assertEquals(5, values[1].length);
-    Assert.assertEquals("key1", values[1][0]);
-    Assert.assertEquals("initial", values[1][1]);
-    Assert.assertEquals("masterValue1\u12AB", values[1][2]);
-    Assert.assertEquals("value1\u12AB", values[1][3]);
-    Assert.assertEquals("context1", values[1][4]);
+    // then
+    assertThat(values, arrayWithSize(2));
+    assertThat(values[0], arrayContaining("Key", "Status", "Master (de)", "Value (fr)", "Context"));
+    assertThat(values[1], arrayContaining("key1", "initial", "masterValue1\u12AB", "value1\u12AB", "context1"));
   }
 
   /**
    * Tests CSVExporter. Export French but no status
    */
   @Test
-  public void testGetValues5() {
+  public void shouldHandleEmptyStatusArray() {
+    // given / when
     String[][] values = exporter.getValues(db.getTextNodes(), db.getMasterLanguage(), "fr", new Status[0]);
-    Assert.assertEquals(1, values.length);
+
+    // then
+    assertThat(values, arrayWithSize(1));
+    assertThat(values[0], arrayContaining("Key", "Status", "Master (de)", "Value (fr)", "Context"));
   }
 
   /**
    * Tests CSVExporter. Export German (master language).
    */
   @Test
-  public void testGetValues6() {
+  public void shouldExportByLanguageAndAllStatuses() {
+    // given / when
     String[][] values = exporter.getValues(db.getTextNodes(), db.getMasterLanguage(), "de", null);
-    Assert.assertEquals(4, values.length);
+
+    // then
+    assertThat(values, arrayWithSize(4));
 
     // header
-    Assert.assertEquals("Key;Status;Value (de);Context", arrayToList(values));
-
-    // first row
-    Assert.assertEquals(4, values[1].length);
-    Assert.assertEquals("key1", values[1][0]);
-    Assert.assertEquals("initial", values[1][1]);
-    Assert.assertEquals("masterValue1\u12AB", values[1][2]);
-    Assert.assertEquals("context1", values[1][3]);
-
-    // second row
-    Assert.assertEquals(4, values[2].length);
-    Assert.assertEquals("key2", values[2][0]);
-    Assert.assertEquals("verified", values[2][1]);
-    Assert.assertEquals("masterValue2öäü", values[2][2]);
-    Assert.assertEquals("context2", values[2][3]);
-
-    // third row
-    Assert.assertEquals(4, values[3].length);
-    Assert.assertEquals("key3", values[3][0]);
-    Assert.assertEquals("special", values[3][1]);
-    Assert.assertEquals("masterValue3", values[3][2]);
-    Assert.assertEquals("context3", values[3][3]);
+    assertThat(values[0], arrayContaining("Key", "Status", "Value (de)", "Context"));
+    // text rows
+    assertThat(values[1], arrayContaining("key1", "initial", "masterValue1\u12AB", "context1"));
+    assertThat(values[2], arrayContaining("key2", "verified", "masterValue2öäü", "context2"));
+    assertThat(values[3], arrayContaining("key3", "special", "masterValue3", "context3"));
   }
-
-  private String arrayToList(String[][] values) {
-    return Joiner.on(";").join(values[0]);
-  }
-
 }

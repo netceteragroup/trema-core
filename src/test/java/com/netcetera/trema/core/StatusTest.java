@@ -1,62 +1,54 @@
 package com.netcetera.trema.core;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 /**
- * Unit test for the <code>Status</code> class.
+ * Test for {@link Status}.
  */
 public class StatusTest {
 
-  /**
-   * Tests the Status.compareTo method.
-   */
   @Test
-  public void testCompareTo() {
-    Assert.assertTrue(0 == Status.INITIAL.compareTo(Status.INITIAL));
-    Assert.assertTrue(0 > Status.INITIAL.compareTo(Status.TRANSLATED));
-    Assert.assertTrue(0 > Status.INITIAL.compareTo(Status.VERIFIED));
-    Assert.assertTrue(0 > Status.INITIAL.compareTo(Status.SPECIAL));
+  void testCompareTo() {
+    assertTrue(0 == Status.INITIAL.compareTo(Status.INITIAL));
+    assertTrue(0 > Status.INITIAL.compareTo(Status.TRANSLATED));
+    assertTrue(0 > Status.INITIAL.compareTo(Status.VERIFIED));
+    assertTrue(0 > Status.INITIAL.compareTo(Status.SPECIAL));
 
-    Assert.assertTrue(0 < Status.TRANSLATED.compareTo(Status.INITIAL));
-    Assert.assertTrue(0 == Status.TRANSLATED.compareTo(Status.TRANSLATED));
-    Assert.assertTrue(0 > Status.TRANSLATED.compareTo(Status.VERIFIED));
-    Assert.assertTrue(0 > Status.TRANSLATED.compareTo(Status.SPECIAL));
+    assertTrue(0 < Status.TRANSLATED.compareTo(Status.INITIAL));
+    assertTrue(0 == Status.TRANSLATED.compareTo(Status.TRANSLATED));
+    assertTrue(0 > Status.TRANSLATED.compareTo(Status.VERIFIED));
+    assertTrue(0 > Status.TRANSLATED.compareTo(Status.SPECIAL));
 
-    Assert.assertTrue(0 < Status.VERIFIED.compareTo(Status.INITIAL));
-    Assert.assertTrue(0 < Status.VERIFIED.compareTo(Status.TRANSLATED));
-    Assert.assertTrue(0 == Status.VERIFIED.compareTo(Status.VERIFIED));
-    Assert.assertTrue(0 > Status.VERIFIED.compareTo(Status.SPECIAL));
+    assertTrue(0 < Status.VERIFIED.compareTo(Status.INITIAL));
+    assertTrue(0 < Status.VERIFIED.compareTo(Status.TRANSLATED));
+    assertTrue(0 == Status.VERIFIED.compareTo(Status.VERIFIED));
+    assertTrue(0 > Status.VERIFIED.compareTo(Status.SPECIAL));
 
-    Assert.assertTrue(0 < Status.SPECIAL.compareTo(Status.INITIAL));
-    Assert.assertTrue(0 < Status.SPECIAL.compareTo(Status.TRANSLATED));
-    Assert.assertTrue(0 < Status.SPECIAL.compareTo(Status.VERIFIED));
-    Assert.assertTrue(0 == Status.SPECIAL.compareTo(Status.SPECIAL));
+    assertTrue(0 < Status.SPECIAL.compareTo(Status.INITIAL));
+    assertTrue(0 < Status.SPECIAL.compareTo(Status.TRANSLATED));
+    assertTrue(0 < Status.SPECIAL.compareTo(Status.VERIFIED));
+    assertTrue(0 == Status.SPECIAL.compareTo(Status.SPECIAL));
   }
 
-  /**
-   * Tests the Status.toString method.
-   */
   @Test
-  public void testToString() {
-    Assert.assertEquals("initial", Status.INITIAL.toString());
-    Assert.assertEquals("translated", Status.TRANSLATED.toString());
-    Assert.assertEquals("verified", Status.VERIFIED.toString());
-    Assert.assertEquals("special", Status.SPECIAL.toString());
+  void testToString() {
+    assertThat(Status.INITIAL.toString(), equalTo("initial"));
+    assertThat(Status.TRANSLATED.toString(), equalTo("translated"));
+    assertThat(Status.VERIFIED.toString(), equalTo("verified"));
+    assertThat(Status.SPECIAL.toString(), equalTo("special"));
   }
 
-  /**
-   * Tests the Status.valueOf method.
-   */
   @Test
-  public void testValueOf() {
-    Assert.assertTrue(Status.INITIAL == Status.valueOf("initial"));
-    Assert.assertTrue(Status.TRANSLATED == Status.valueOf("translated"));
-    Assert.assertTrue(Status.VERIFIED == Status.valueOf("verified"));
-    Assert.assertTrue(Status.SPECIAL == Status.valueOf("special"));
-    Assert.assertTrue(Status.UNDEFINED == Status.valueOf("blah"));
+  void testValueOf() {
+    assertThat(Status.valueOf("initial"), equalTo(Status.INITIAL));
+    assertThat(Status.valueOf("translated"), equalTo(Status.TRANSLATED));
+    assertThat(Status.valueOf("verified"), equalTo(Status.VERIFIED));
+    assertThat(Status.valueOf("special"), equalTo(Status.SPECIAL));
+    assertThat(Status.valueOf("blah"), equalTo(Status.UNDEFINED));
   }
-
 }

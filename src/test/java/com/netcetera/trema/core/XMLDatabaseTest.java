@@ -1,24 +1,25 @@
 package com.netcetera.trema.core;
 
-import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 import com.netcetera.trema.core.api.ITextNode;
 import com.netcetera.trema.core.api.IValueNode;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
-import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.arrayContaining;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.nullValue;
 
 
 /**
- * Unit test for the <code>XMLDatabase</code> class.
+ * Test for {@link XMLDatabase}.
  */
-public class XMLDatabaseTest {
+class XMLDatabaseTest {
 
   private static final String TEST_KEY = "testKey";
   private static final String TEST_LANGUAGE = "jp";
@@ -31,7 +32,7 @@ public class XMLDatabaseTest {
    * @throws Exception in case the test fails
    */
   @Test
-  public void testBuild() throws Exception {
+  void testBuild() throws Exception {
     XMLDatabase db = new XMLDatabase();
     for (int i = 0; i < 3; i++) { // build the database 3 times
       db.build("<?xml version='1.0' encoding='UTF-8'?><trema masterLang='de'>"
@@ -51,29 +52,29 @@ public class XMLDatabaseTest {
                + "</text>"
                + "</trema>", false);
 
-      Assert.assertEquals("de", db.getMasterLanguage());
-      Assert.assertEquals(3, db.getSize());
+      assertThat(db.getMasterLanguage(), equalTo("de"));
+      assertThat(db.getSize(), equalTo(3));
 
       for (int j = 1; j <= 3; j++) {
         ITextNode textNode = db.getTextNode(j - 1);
         ITextNode textNode2 = db.getTextNode("key" + j);
-        Assert.assertTrue(textNode == textNode2);
+        assertThat(textNode2, equalTo(textNode));
 
         // context
-        Assert.assertEquals("context" + j, textNode.getContext());
+        assertThat(textNode.getContext(), equalTo("context" + j));
 
         // German
         IValueNode valueNode = textNode.getValueNode("de");
-        Assert.assertEquals("masterValue" + j + "\u12AB", valueNode.getValue());
-        Assert.assertTrue(Status.SPECIAL == valueNode.getStatus());
+        assertThat(valueNode.getValue(), equalTo("masterValue" + j + "\u12AB"));
+        assertThat(valueNode.getStatus(), equalTo(Status.SPECIAL));
 
         // French
         valueNode = textNode.getValueNode("fr");
-        Assert.assertEquals("value" + j + "äöü", valueNode.getValue());
-        Assert.assertTrue(Status.INITIAL == valueNode.getStatus());
+        assertThat(valueNode.getValue(), equalTo("value" + j + "äöü"));
+        assertThat(valueNode.getStatus(), equalTo(Status.INITIAL));
 
         // inexisting language
-        Assert.assertNull(textNode.getValueNode("idonotexist"));
+        assertThat(textNode.getValueNode("idonotexist"), nullValue());
       }
     }
   }
@@ -84,14 +85,14 @@ public class XMLDatabaseTest {
    * @throws Exception incase the test fails
    */
   @Test
-  public void testUTF8() throws Exception {
-      XMLDatabase db = new XMLDatabase();
-      db.build(Files.toString(new File(ConstantsTest.TEST_UTF8_PATHNAME), Charsets.UTF_8), false);
+  void testUTF8() throws Exception {
+    XMLDatabase db = new XMLDatabase();
+    db.build(Files.toString(new File(ConstantsTest.TEST_UTF8_PATHNAME), StandardCharsets.UTF_8), false);
 
-      ITextNode textNode = db.getTextNode(TEST_KEY);
-      IValueNode valueNode = textNode.getValueNode(TEST_LANGUAGE);
+    ITextNode textNode = db.getTextNode(TEST_KEY);
+    IValueNode valueNode = textNode.getValueNode(TEST_LANGUAGE);
 
-      Assert.assertThat(valueNode.getValue(), is(TEST_UTF8_VALUE));
+    assertThat(valueNode.getValue(), equalTo(TEST_UTF8_VALUE));
   }
 
   /**
@@ -100,14 +101,14 @@ public class XMLDatabaseTest {
    * @throws Exception incase the test fails
    */
   @Test
-  public void testISO() throws Exception {
-      XMLDatabase db = new XMLDatabase();
-      db.build(Files.toString(new File(ConstantsTest.TEST_ISO_PATHNAME), Charsets.ISO_8859_1), false);
+  void testISO() throws Exception {
+    XMLDatabase db = new XMLDatabase();
+    db.build(Files.toString(new File(ConstantsTest.TEST_ISO_PATHNAME), StandardCharsets.ISO_8859_1), false);
 
-      ITextNode textNode = db.getTextNode(TEST_KEY);
-      IValueNode valueNode = textNode.getValueNode(TEST_LANGUAGE);
+    ITextNode textNode = db.getTextNode(TEST_KEY);
+    IValueNode valueNode = textNode.getValueNode(TEST_LANGUAGE);
 
-      Assert.assertThat(valueNode.getValue(), is(TEST_ISO_VALUE));
+    assertThat(valueNode.getValue(), equalTo(TEST_ISO_VALUE));
   }
 
   /**
@@ -116,42 +117,42 @@ public class XMLDatabaseTest {
    * @throws Exception incase the test fails
    */
   @Test
- public void testOperations() throws Exception {
-   XMLDatabase db = new XMLDatabase();
-   db.build("<?xml version='1.0' encoding='UTF-8'?><trema masterLang='de'>"
-            + "<!-- test comment -->"
-            + "<text key='key1'> <context>context1</context>"
-            + "</text>"
-            + "<text key='key2'> <context>context2</context>"
-            + "</text>"
-            + "<text key='key3'> <context>context3</context>"
-            + "</text>"
-            + "</trema>", false);
+  void testOperations() throws Exception {
+    XMLDatabase db = new XMLDatabase();
+    db.build("<?xml version='1.0' encoding='UTF-8'?><trema masterLang='de'>"
+      + "<!-- test comment -->"
+      + "<text key='key1'> <context>context1</context>"
+      + "</text>"
+      + "<text key='key2'> <context>context2</context>"
+      + "</text>"
+      + "<text key='key3'> <context>context3</context>"
+      + "</text>"
+      + "</trema>", false);
 
-   Assert.assertEquals("de", db.getMasterLanguage());
-   Assert.assertEquals(3, db.getSize());
+    assertThat(db.getMasterLanguage(), equalTo("de"));
+    assertThat(db.getSize(), equalTo(3));
 
-   ITextNode textNode1 = db.getTextNode(0);
-   ITextNode textNode2 = db.getTextNode(1);
-   ITextNode textNode3 = db.getTextNode(2);
+    ITextNode textNode1 = db.getTextNode(0);
+    ITextNode textNode2 = db.getTextNode(1);
+    ITextNode textNode3 = db.getTextNode(2);
 
-   db.moveUpTextNodes(new ITextNode[] {textNode1});
-   Assert.assertArrayEquals(new ITextNode[] {textNode1, textNode2, textNode3}, db.getTextNodes());
+    db.moveUpTextNodes(new ITextNode[] {textNode1});
+    assertThat(db.getTextNodes(), arrayContaining(textNode1, textNode2, textNode3));
 
-   db.moveDownTextNodes(new ITextNode[] {textNode1});
-   Assert.assertArrayEquals(new ITextNode[] {textNode2, textNode1, textNode3}, db.getTextNodes());
+    db.moveDownTextNodes(new ITextNode[] {textNode1});
+    assertThat(db.getTextNodes(), arrayContaining(textNode2, textNode1, textNode3));
 
-   db.moveDownTextNodes(new ITextNode[] {textNode2, textNode1});
-   Assert.assertArrayEquals(new ITextNode[] {textNode3, textNode2, textNode1}, db.getTextNodes());
+    db.moveDownTextNodes(new ITextNode[] {textNode2, textNode1});
+    assertThat(db.getTextNodes(), arrayContaining(textNode3, textNode2, textNode1));
 
-   db.moveUpTextNodes(new ITextNode[] {textNode2, textNode1});
-   Assert.assertArrayEquals(new ITextNode[] {textNode2, textNode1, textNode3}, db.getTextNodes());
+    db.moveUpTextNodes(new ITextNode[] {textNode2, textNode1});
+    assertThat(db.getTextNodes(), arrayContaining(textNode2, textNode1, textNode3));
 
-   db.removeTextNode(textNode2.getKey());
-   Assert.assertArrayEquals(new ITextNode[] {textNode1, textNode3}, db.getTextNodes());
+    db.removeTextNode(textNode2.getKey());
+    assertThat(db.getTextNodes(), arrayContaining(textNode1, textNode3));
 
-   db.removeTextNodes(new ITextNode[] {textNode2, textNode1, textNode3});
-   Assert.assertEquals(0, db.getSize());
+    db.removeTextNodes(new ITextNode[] {textNode2, textNode1, textNode3});
+    assertThat(db.getSize(), equalTo(0));
  }
 
   /**
@@ -160,7 +161,7 @@ public class XMLDatabaseTest {
    * @throws Exception in case the test fails
    */
   @Test
-  public void testCreateHugeDatabase() throws Exception {
+  void testCreateHugeDatabase() throws Exception {
     XMLDatabase db = new XMLDatabase();
     db.setMasterLanguage("de");
 
@@ -183,30 +184,10 @@ public class XMLDatabaseTest {
       s = new FileOutputStream(ConstantsTest.TEST_HUGE_PATHNAME);
       db.writeXML(s, "UTF-8", "  ", "\n");
     } finally {
-      if (s != null) {
-        try {
-          s.close();
-        } catch (IOException e) {
-          // nothing to do
-        }
-      }
       f = new File(ConstantsTest.TEST_HUGE_PATHNAME);
       f.delete();
       d = new File("tmp");
       d.delete();
     }
   }
-
-  @Test
-  public void testInvalidDB() throws Exception {
-    XMLDatabase db = new XMLDatabase();
-    try {
-      db.build(new FileInputStream("src/test/resources/filewitherrors.xml"), false);
-    } catch (Exception e) {
-      System.out.println(e.toString());
-    }
-  }
-
-
-
 }

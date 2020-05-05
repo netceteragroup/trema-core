@@ -45,15 +45,14 @@ public class AndroidExportFilter implements IExportFilter {
    * </tr>
    * </table>
    *
-   * @param aText text to escape, must not be null
+   * @param text text to escape, must not be null
    * @return escaped text
    */
-  protected static String escapeXmlSpecialCharacters(String aText) {
-    String result = aText;
-    result = result.replaceAll("&", "&amp;");
-    result = result.replaceAll("\'", "\\\\&#039;");
-    result = result.replaceAll("'", "\\\\&#039;");
-    return result;
+  protected static String escapeXmlSpecialCharacters(String text) {
+    return text
+      .replace("&", "&amp;")
+      .replace("\\'", "\\&#039;")
+      .replace("'", "\\&#039;");
   }
 
   /**
@@ -65,7 +64,7 @@ public class AndroidExportFilter implements IExportFilter {
    */
   protected static String escapeKeyName(String keyName) {
     // replace dot with underscore
-    return keyName.replaceAll("[\\.\\-]", "\\_");
+    return keyName.replaceAll("[.\\-]", "\\_");
   }
 
 }

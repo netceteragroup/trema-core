@@ -1,127 +1,144 @@
 package com.netcetera.trema.core;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.arrayWithSize;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 /**
- * Unit test for the <code>XMLDatabase</code> class.
+ * Test for the XSD validation in {@link XMLDatabase}.
  */
-public class XSDValidationTest {
+class XSDValidationTest {
 
   private static final String XSD_LOCATION = "xsi:noNamespaceSchemaLocation="
     + "\"http://software.group.nca/trema/schema/trema-1.0.xsd\"";
   private static final String SCHEMA_NAMESPACE = "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"";
 
 
-  /**
-   * key1 contains 2 values for the same language, this is not allowed by the xsd.
-   *
-   * @throws Exception an expected ParseException
-   */
-  @Test(expected = ParseException.class)
-  public void testXsdValidation1() throws Exception {
+  @Test
+  void shouldThrowForDuplicateLanguage() {
+    // given
+    String xmlContents = "<?xml version='1.0' encoding='UTF-8'?>"
+      + "<trema masterLang='de' " + SCHEMA_NAMESPACE + " " + XSD_LOCATION + ">"
+      + "<text key='key1'> <context>context1</context>"
+      + "  <value lang='de' status='initial'>de-value</value>"
+      + "  <value lang='de' status='initial'>fr-value</value>"
+      + "</text>"
+      + "</trema>";
     XMLDatabase db = new XMLDatabase();
-      db.build("<?xml version='1.0' encoding='UTF-8'?>"
-         + "<trema masterLang='de' " + SCHEMA_NAMESPACE + " " + XSD_LOCATION + ">"
-         + "<text key='key1'> <context>context1</context>"
-         + "  <value lang='de' status='initial'>de-value</value>"
-         + "  <value lang='de' status='initial'>fr-value</value>"
-         + "</text>"
-         + "</trema>", true);
+
+    // when / then
+    assertThrows(ParseException.class,
+      () -> db.build(xmlContents, true));
   }
 
-  /**
-   * Key1 is used twice in the file which is not allowed by the xsd.
-   *
-   * @throws Exception an expected ParseException
-   */
-  @Test(expected = ParseException.class)
-  public void testXsdValidation2() throws Exception {
+  @Test
+  void shouldThrowForDuplicateKey() {
+    // given
+    String xmlContents = "<?xml version='1.0' encoding='UTF-8'?>"
+      + "<trema masterLang='de' " + SCHEMA_NAMESPACE + " " + XSD_LOCATION + ">"
+      + "<text key='key1'> <context>context1</context>"
+      + "  <value lang='de' status='initial'>de-value</value>"
+      + "</text>"
+      + "<text key='key1'> <context>context1</context>"
+      + "  <value lang='de' status='initial'>de-value</value>"
+      + "</text>"
+      + "</trema>";
     XMLDatabase db = new XMLDatabase();
-    db.build("<?xml version='1.0' encoding='UTF-8'?>"
-        + "<trema masterLang='de' " + SCHEMA_NAMESPACE + " " + XSD_LOCATION + ">"
-        + "<text key='key1'> <context>context1</context>"
-        + "  <value lang='de' status='initial'>de-value</value>"
-        + "</text>"
-        + "<text key='key1'> <context>context1</context>"
-        + "  <value lang='de' status='initial'>de-value</value>"
-        + "</text>"
-        + "</trema>", true);
+
+    // when / then
+    assertThrows(ParseException.class,
+      () -> db.build(xmlContents, true));
   }
 
-  /**
-   * Invalid status is used, will cause validation failure.
-   *
-   * @throws Exception an expected ParseException
-   */
-  @Test(expected = ParseException.class)
-  public void testXsdValidation3() throws Exception {
+  @Test
+  void shouldThrowForUnknownStatus() {
+    // given
+    String xmlContents = "<?xml version='1.0' encoding='UTF-8'?>"
+      + "<trema masterLang='de' " + SCHEMA_NAMESPACE + " " + XSD_LOCATION + ">"
+      + "<text key='key1'> <context>context1</context>"
+      + "  <value lang='de' status='somethingwrong'>de-value</value>"
+      + "</text>"
+      + "</trema>";
     XMLDatabase db = new XMLDatabase();
-    db.build("<?xml version='1.0' encoding='UTF-8'?>"
-        + "<trema masterLang='de' " + SCHEMA_NAMESPACE + " " + XSD_LOCATION + ">"
-        + "<text key='key1'> <context>context1</context>"
-        + "  <value lang='de' status='somethingwrong'>de-value</value>"
-        + "</text>"
-        + "</trema>", true);
+
+    // when / then
+    assertThrows(ParseException.class,
+      () -> db.build(xmlContents, true));
   }
 
-  /**
-   * Context is not provided, will cause validation failure.
-   *
-   * @throws Exception an expected ParseException
-   */
-  @Test(expected = ParseException.class)
-  public void testXsdValidation4() throws Exception {
+  @Test
+  void shouldThrowForMissingContext() {
+    // given
+    String xmlContents = "<?xml version='1.0' encoding='UTF-8'?>"
+      + "<trema masterLang='de' " + SCHEMA_NAMESPACE + " " + XSD_LOCATION + ">"
+      + "<text key='key1'>"
+      + "  <value lang='de' status='initial'>de-value</value>"
+      + "</text>"
+      + "</trema>";
     XMLDatabase db = new XMLDatabase();
-    db.build("<?xml version='1.0' encoding='UTF-8'?>"
-        + "<trema masterLang='de' " + SCHEMA_NAMESPACE + " " + XSD_LOCATION + ">"
-        + "<text key='key1'>"
-        + "  <value lang='de' status='initial'>de-value</value>"
-        + "</text>"
-        + "</trema>", false);
+
+    // when / then
+    assertThrows(ParseException.class,
+      () -> db.build(xmlContents, false));
   }
 
   /**
    * Key1 is used twice in the file which is not allowed by the xsd. However a wrong xsd location is
    * provided and the parser will therefore not validate.
    *
-   * @throws Exception an expected ParseException
+   * @throws Exception in case of errors
    */
   @Test
-  public void testXSDValidation3() throws Exception {
+  void shouldTreatDuplicateKeyAsParseWarningDueToUnknownXsd() throws Exception {
+    // given
+    String xmlContents = "<?xml version='1.0' encoding='UTF-8'?>"
+      + "<trema masterLang='de' " + SCHEMA_NAMESPACE
+      + " xsi:noNamespaceSchemaLocation='http://localhost/doesntexist.xsd'>"
+      + "<text key='key1'> <context>context1</context>"
+      + "  <value lang='de' status='initial'>de-value</value>"
+      + "</text>"
+      + "<text key='key1'> <context>context1</context>"
+      + "  <value lang='de' status='initial'>de-value</value>"
+      + "</text>"
+      + "</trema>";
     XMLDatabase db = new XMLDatabase();
-    db.build("<?xml version='1.0' encoding='UTF-8'?>"
-        + "<trema masterLang='de' " + SCHEMA_NAMESPACE
-        + " xsi:noNamespaceSchemaLocation='http://localhost/doesntexist.xsd'>"
-        + "<text key='key1'> <context>context1</context>"
-        + "  <value lang='de' status='initial'>de-value</value>"
-        + "</text>"
-        + "<text key='key1'> <context>context1</context>"
-        + "  <value lang='de' status='initial'>de-value</value>"
-        + "</text>"
-        + "</trema>", false);
+
+    // when
+    db.build(xmlContents, false);
+
+    // then - no exception
+    assertThat(db.getParseWarnings(), arrayWithSize(1));
   }
 
   /**
    * Key1 is used twice in the file which is not allowed. No xsd is provided, so the parser will not find a problem.
    * However Trema does check for duplicated keys and will produce a warning.
    *
-   * @throws Exception an expected ParseException
+   * @throws Exception in case of an error
    */
   @Test
-  public void testNoXsdProvided() throws Exception {
+  void shouldTreatDuplicateKeyAsParseWarningDueToMissingXsd() throws Exception {
+    // given
+    String xmlContents = "<?xml version='1.0' encoding='UTF-8'?>"
+      + "<trema masterLang='de'>"
+      + "<text key='key1'> <context>context1</context>"
+      + "  <value lang='de' status='initial'>de-value</value>"
+      + "</text>"
+      + "<text key='key1'> <context>context1</context>"
+      + "  <value lang='de' status='initial'>de-value</value>"
+      + "</text>"
+      + "</trema>";
     XMLDatabase db = new XMLDatabase();
-    db.build("<?xml version='1.0' encoding='UTF-8'?>"
-        + "<trema masterLang='de'>"
-        + "<text key='key1'> <context>context1</context>"
-        + "  <value lang='de' status='initial'>de-value</value>"
-        + "</text>"
-        + "<text key='key1'> <context>context1</context>"
-        + "  <value lang='de' status='initial'>de-value</value>"
-        + "</text>"
-        + "</trema>", false);
-    Assert.assertTrue(db.getParseWarnings().length == 1);
+
+    // when
+    db.build(xmlContents, false);
+
+    // then - no exception
+    assertThat(db.getParseWarnings(), arrayWithSize(1));
   }
 }

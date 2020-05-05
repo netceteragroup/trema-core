@@ -5,22 +5,23 @@ import com.netcetera.trema.core.XMLDatabase;
 import com.netcetera.trema.core.XMLTextNode;
 import com.netcetera.trema.core.XMLValueNode;
 import com.netcetera.trema.core.api.ITextNode;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.arrayWithSize;
+import static org.hamcrest.Matchers.equalTo;
 
 
 /**
- * Unit test for the <code>ChangesAnalyzer</code> class.
+ * Unit test for {@link ChangesAnalyzer}.
  */
-public class ChangesAnalyzerTest {
+class ChangesAnalyzerTest {
 
   /**
    * Import source without master language.
-   * @throws Exception in case the test fails
    */
   @Test
-  public void testAnalyze1() throws Exception {
+  void testAnalyze1() {
     XMLDatabase db = new XMLDatabase();
     db.setMasterLanguage("de");
     ITextNode textNode = new XMLTextNode("key1", "context1");
@@ -64,8 +65,8 @@ public class ChangesAnalyzerTest {
     Change[] conflictingChanges = analyzer.getConflictingChanges();
     Change[] nonConflictingChanges = analyzer.getNonConflictingChanges();
   
-    Assert.assertEquals(5, conflictingChanges.length);
-    Assert.assertEquals(3, nonConflictingChanges.length);
+    assertThat(conflictingChanges, arrayWithSize(5));
+    assertThat(nonConflictingChanges, arrayWithSize(3));
     
     checkChangeTypes(conflictingChanges, nonConflictingChanges,
         1, 1, 1, 1, 0, 0, 3, 1);    
@@ -73,10 +74,9 @@ public class ChangesAnalyzerTest {
   
   /**
    * Import source with master language.
-   * @throws Exception in case the test fails
    */
   @Test
-  public void testAnalyzeMasterLanguageImportSource() throws Exception {
+  void testAnalyzeMasterLanguageImportSource() {
     XMLDatabase db = new XMLDatabase();
     db.setMasterLanguage("de");
     ITextNode textNode = new XMLTextNode("key1", "context1");
@@ -117,9 +117,9 @@ public class ChangesAnalyzerTest {
     analyzer.analyze();
     Change[] conflictingChanges = analyzer.getConflictingChanges();
     Change[] nonConflictingChanges = analyzer.getNonConflictingChanges();
-  
-    Assert.assertEquals(5, conflictingChanges.length);
-    Assert.assertEquals(2, nonConflictingChanges.length);
+
+    assertThat(conflictingChanges, arrayWithSize(5));
+    assertThat(nonConflictingChanges, arrayWithSize(2));
     
     checkChangeTypes(conflictingChanges, nonConflictingChanges,
         1, 1, 0, 1, 1, 1, 2, 0);    
@@ -135,7 +135,7 @@ public class ChangesAnalyzerTest {
   // however its a unittest   
   
   // CHECKSTYLE:OFF
-  private void checkChangeTypes(Change[] conflictingChanges, Change[] nonConflictingChanges, 
+  private void checkChangeTypes(Change[] conflictingChanges, Change[] nonConflictingChanges,
       int additionCount,
       int statusNewerCount,
       int statusOlderCount,
@@ -174,14 +174,14 @@ public class ChangesAnalyzerTest {
       }
     }
     
-    Assert.assertEquals(additionCount, addition);
-    Assert.assertEquals(statusNewerCount, statusNewer);
-    Assert.assertEquals(statusOlderCount, statusOlder);
-    Assert.assertEquals(languageAdditionCount, languageAddition);
-    Assert.assertEquals(masterLanguageAdditionCount, masterLanguageAddition);
-    Assert.assertEquals(masterValueChangedCount, masterValueChanged);    
-    Assert.assertEquals(valueAndStatusChangedCount, valueAndStatusChanged);
-    Assert.assertEquals(valueChangedCount, valueChanged);
+    assertThat(addition, equalTo(additionCount));
+    assertThat(statusNewer, equalTo(statusNewerCount));
+    assertThat(statusOlder, equalTo(statusOlderCount));
+    assertThat(languageAddition, equalTo(languageAdditionCount));
+    assertThat(masterLanguageAddition, equalTo(masterLanguageAdditionCount));
+    assertThat(masterValueChanged, equalTo(masterValueChangedCount));
+    assertThat(valueAndStatusChanged, equalTo(valueAndStatusChangedCount));
+    assertThat(valueChanged, equalTo(valueChangedCount));
   }
   
 }
