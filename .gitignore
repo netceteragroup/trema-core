@@ -1,5 +1,7 @@
-/target/
+target/
+.idea/
 
+*.iml
 *.class
 
 # Package Files #
