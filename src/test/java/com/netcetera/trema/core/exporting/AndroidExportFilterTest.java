@@ -1,8 +1,10 @@
 package com.netcetera.trema.core.exporting;
 
-import com.google.common.collect.ImmutableMap;
 import com.netcetera.trema.core.api.IKeyValuePair;
 import org.junit.jupiter.api.Test;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -20,14 +22,13 @@ public class AndroidExportFilterTest {
   @Test
   public void shouldEscapeXmlSpecialCharacters() {
     // given
-    ImmutableMap<String, String> textAndExpectedOutput = ImmutableMap.<String, String>builder()
-      .put("it\\'s", "it\\&#039;s")
-      .put("it's", "it\\&#039;s")
-      .put("it's it's", "it\\&#039;s it\\&#039;s")
-      .put("nothingToEscape", "nothingToEscape")
-      .put("html <b>allow</b>", "html <b>allow</b>")
-      .put("tom&jerry", "tom&amp;jerry")
-      .build();
+    Map<String, String> textAndExpectedOutput = new HashMap<>();
+    textAndExpectedOutput.put("it\\'s", "it\\&#039;s");
+    textAndExpectedOutput.put("it's", "it\\&#039;s");
+    textAndExpectedOutput.put("it's it's", "it\\&#039;s it\\&#039;s");
+    textAndExpectedOutput.put("nothingToEscape", "nothingToEscape");
+    textAndExpectedOutput.put("html <b>allow</b>", "html <b>allow</b>");
+    textAndExpectedOutput.put("tom&jerry", "tom&amp;jerry");
 
     textAndExpectedOutput.forEach((input, expected) -> {
       // when

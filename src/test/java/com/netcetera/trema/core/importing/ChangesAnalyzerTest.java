@@ -1,6 +1,5 @@
 package com.netcetera.trema.core.importing;
 
-import com.google.common.collect.ImmutableMap;
 import com.netcetera.trema.core.Status;
 import com.netcetera.trema.core.XMLDatabase;
 import com.netcetera.trema.core.XMLTextNode;
@@ -9,6 +8,7 @@ import com.netcetera.trema.core.api.ITextNode;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -74,14 +74,13 @@ class ChangesAnalyzerTest {
     assertThat(conflictingChanges, arrayWithSize(5));
     assertThat(nonConflictingChanges, arrayWithSize(3));
 
-    Map<Integer, Long> expectedChangeCounts = ImmutableMap.<Integer, Long>builder()
-      .put(Change.TYPE_KEY_ADDITION, 1L)
-      .put(Change.TYPE_IMPORTED_STATUS_NEWER, 1L)
-      .put(Change.TYPE_IMPORTED_STATUS_OLDER, 1L)
-      .put(Change.TYPE_LANGUAGE_ADDITION, 1L)
-      .put(Change.TYPE_VALUE_AND_STATUS_CHANGED, 3L)
-      .put(Change.TYPE_VALUE_CHANGED, 1L)
-      .build();
+    Map<Integer, Long> expectedChangeCounts = new HashMap<>();
+    expectedChangeCounts.put(Change.TYPE_KEY_ADDITION, 1L);
+    expectedChangeCounts.put(Change.TYPE_IMPORTED_STATUS_NEWER, 1L);
+    expectedChangeCounts.put(Change.TYPE_IMPORTED_STATUS_OLDER, 1L);
+    expectedChangeCounts.put(Change.TYPE_LANGUAGE_ADDITION, 1L);
+    expectedChangeCounts.put(Change.TYPE_VALUE_AND_STATUS_CHANGED, 3L);
+    expectedChangeCounts.put(Change.TYPE_VALUE_CHANGED, 1L);
     verifyNumberOfChanges(analyzer, expectedChangeCounts);
   }
   
@@ -134,14 +133,13 @@ class ChangesAnalyzerTest {
     assertThat(conflictingChanges, arrayWithSize(5));
     assertThat(nonConflictingChanges, arrayWithSize(2));
 
-    Map<Integer, Long> expectedChangeCounts = ImmutableMap.<Integer, Long>builder()
-      .put(Change.TYPE_KEY_ADDITION, 1L)
-      .put(Change.TYPE_IMPORTED_STATUS_NEWER, 1L)
-      .put(Change.TYPE_LANGUAGE_ADDITION, 1L)
-      .put(Change.TYPE_MASTER_LANGUAGE_ADDITION, 1L)
-      .put(Change.TYPE_MASTER_VALUE_CHANGED, 1L)
-      .put(Change.TYPE_VALUE_AND_STATUS_CHANGED, 2L)
-      .build();
+    Map<Integer, Long> expectedChangeCounts = new HashMap<>();
+    expectedChangeCounts.put(Change.TYPE_KEY_ADDITION, 1L);
+    expectedChangeCounts.put(Change.TYPE_IMPORTED_STATUS_NEWER, 1L);
+    expectedChangeCounts.put(Change.TYPE_LANGUAGE_ADDITION, 1L);
+    expectedChangeCounts.put(Change.TYPE_MASTER_LANGUAGE_ADDITION, 1L);
+    expectedChangeCounts.put(Change.TYPE_MASTER_VALUE_CHANGED, 1L);
+    expectedChangeCounts.put(Change.TYPE_VALUE_AND_STATUS_CHANGED, 2L);
     verifyNumberOfChanges(analyzer, expectedChangeCounts);
   }
 
