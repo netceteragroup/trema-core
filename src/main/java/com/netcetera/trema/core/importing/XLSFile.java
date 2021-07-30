@@ -12,6 +12,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Row.MissingCellPolicy;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 
@@ -38,26 +39,16 @@ public class XLSFile extends AbstractFile {
    * Constructs a new CSV file from a path name.
    *
    * @param pathName the path
-   * @throws ParseException if any parse errors ocur supported
+   * @throws ParseException if any parse errors occur
    */
   public XLSFile(String pathName) throws ParseException {
     this.pathName = pathName;
-    FileInputStream fileInputStream = null;
-    try {
-      fileInputStream = new FileInputStream(pathName);
+    try (FileInputStream fileInputStream = new FileInputStream(pathName)) {
       POIFSFileSystem fs = new POIFSFileSystem(fileInputStream);
       Workbook ws = new HSSFWorkbook(fs);
       parse(ws);
     } catch (IOException e) {
       throw new ParseException("Failed to import file: " + e.getMessage());
-    } finally {
-      if (fileInputStream != null) {
-        try {
-          fileInputStream.close();
-        } catch (IOException e) {
-          // Ignore
-        }
-      }
     }
   }
 
@@ -65,7 +56,7 @@ public class XLSFile extends AbstractFile {
   /**
    * Parses a CSV file from a given reader.
    *
-   * @throws ParseException if any parse errors ocur
+   * @throws ParseException if any parse errors occur
    */
   private void parse(Workbook ws) throws ParseException {
     LOG.info("Parsing XLS file...");
@@ -153,13 +144,13 @@ public class XLSFile extends AbstractFile {
       LOG.info("ignoring row it is null");
       return;
     }
-    Cell keyCell = r.getCell(cellmap.get(AbstractFile.KEY_HEADER), Row.RETURN_BLANK_AS_NULL);
-    Cell statusCell = r.getCell(cellmap.get(AbstractFile.STATUS_HEADER), Row.RETURN_BLANK_AS_NULL);
-    Cell valueCell = r.getCell(cellmap.get(AbstractFile.VALUE_HEADER), Row.RETURN_NULL_AND_BLANK);
+    Cell keyCell = r.getCell(cellmap.get(AbstractFile.KEY_HEADER), MissingCellPolicy.RETURN_BLANK_AS_NULL);
+    Cell statusCell = r.getCell(cellmap.get(AbstractFile.STATUS_HEADER), MissingCellPolicy.RETURN_BLANK_AS_NULL);
+    Cell valueCell = r.getCell(cellmap.get(AbstractFile.VALUE_HEADER), MissingCellPolicy.RETURN_NULL_AND_BLANK);
     // Master Cell can be null, if the xls is the export of the master language
     Cell masterCell = null;
     if (cellmap.containsKey(AbstractFile.MASTER_HEADER)) {
-      masterCell = r.getCell(cellmap.get(AbstractFile.MASTER_HEADER), Row.RETURN_BLANK_AS_NULL);
+      masterCell = r.getCell(cellmap.get(AbstractFile.MASTER_HEADER), MissingCellPolicy.RETURN_BLANK_AS_NULL);
     }
 
     // sometimes there are blank lines in the xls file which are ignored

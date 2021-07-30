@@ -1,5 +1,24 @@
 package com.netcetera.trema.core.exporting;
 
+import com.netcetera.trema.core.Status;
+import com.netcetera.trema.core.api.ITextNode;
+import com.netcetera.trema.core.importing.XLSFile;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.hssf.util.HSSFColor.HSSFColorPredefined;
+import org.apache.poi.ss.usermodel.BorderStyle;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.PrintSetup;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -7,22 +26,6 @@ import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.hssf.util.HSSFColor;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.Font;
-import org.apache.poi.ss.usermodel.PrintSetup;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-
-import com.netcetera.trema.core.Status;
-import com.netcetera.trema.core.api.ITextNode;
-import com.netcetera.trema.core.importing.XLSFile;
 
 
 /**
@@ -98,22 +101,12 @@ public class XLSExporter extends AbstractSpreadSheetExporter {
     }
 
     // Write the output to a file
-    FileOutputStream out = null;
-    try {
-      out = new FileOutputStream(outputfile);
+    try (FileOutputStream out = new FileOutputStream(outputfile)) {
       wb.write(out);
     } catch (FileNotFoundException e) {
       throw new ExportException("Could not create output file", e);
     } catch (IOException e) {
       throw new ExportException("Could not write to output file", e);
-    } finally {
-        try {
-          if (out != null) {
-            out.close();
-          }
-        } catch (IOException e) {
-          // ignore
-        }
     }
     LOG.info("Exporting of XLS file finished.");
   }
@@ -128,16 +121,16 @@ public class XLSExporter extends AbstractSpreadSheetExporter {
     CellStyle style;
     Font headerFont = wb.createFont();
     style = createBorderedStyle(wb);
-    style.setAlignment(CellStyle.ALIGN_CENTER);
+    style.setAlignment(HorizontalAlignment.CENTER);
     style.setFillForegroundColor(HSSFColor.LIGHT_CORNFLOWER_BLUE.index);
-    style.setFillPattern(CellStyle.SOLID_FOREGROUND);
+    style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
     style.setFont(headerFont);
     styles.put("header", style);
 
 
     Font font1 = wb.createFont();
     style = createBorderedStyle(wb);
-    style.setAlignment(CellStyle.ALIGN_LEFT);
+    style.setAlignment(HorizontalAlignment.LEFT);
     style.setFont(font1);
     styles.put("cell_b", style);
 
@@ -147,14 +140,14 @@ public class XLSExporter extends AbstractSpreadSheetExporter {
 
   private static CellStyle createBorderedStyle(Workbook wb) {
     CellStyle style = wb.createCellStyle();
-    style.setBorderRight(CellStyle.BORDER_THIN);
-    style.setRightBorderColor(HSSFColor.BLACK.index);
-    style.setBorderBottom(CellStyle.BORDER_THIN);
-    style.setBottomBorderColor(HSSFColor.BLACK.index);
-    style.setBorderLeft(CellStyle.BORDER_THIN);
-    style.setLeftBorderColor(HSSFColor.BLACK.index);
-    style.setBorderTop(CellStyle.BORDER_THIN);
-    style.setTopBorderColor(HSSFColor.BLACK.index);
+    style.setBorderRight(BorderStyle.THIN);
+    style.setRightBorderColor(HSSFColorPredefined.BLACK.getIndex());
+    style.setBorderBottom(BorderStyle.THIN);
+    style.setBottomBorderColor(HSSFColorPredefined.BLACK.getIndex());
+    style.setBorderLeft(BorderStyle.THIN);
+    style.setLeftBorderColor(HSSFColorPredefined.BLACK.getIndex());
+    style.setBorderTop(BorderStyle.THIN);
+    style.setTopBorderColor(HSSFColorPredefined.BLACK.getIndex());
     return style;
   }
 
