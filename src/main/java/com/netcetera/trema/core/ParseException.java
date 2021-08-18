@@ -7,7 +7,6 @@ package com.netcetera.trema.core;
  */
 public class ParseException extends Exception {
   
-  /** Comment for <code>serialVersionUID</code>. */
   private static final long serialVersionUID = 1L;
   
   private final int lineNumber;
@@ -22,6 +21,7 @@ public class ParseException extends Exception {
   
   /**
    * Constructs a new trema <code>ParseException</code>.
+   *
    * @param message the error message
    */
   public ParseException(String message) {
@@ -31,8 +31,9 @@ public class ParseException extends Exception {
   
   /**
    * Constructs a new trema <code>ParseException</code>.
+   *
    * @param message the error message
-   * @param lineNumber the line number where the parse error occured
+   * @param lineNumber the line number where the parse error occurred
    */
   public ParseException(String message, int lineNumber) {
     super(message);
@@ -41,8 +42,9 @@ public class ParseException extends Exception {
   
   /**
    * Gets the line number of the parse error.
+   *
    * @return the line number of the parse error or zero if no line
-   * number is available.
+   * number is available
    */
   public int getLineNumber() {
     return lineNumber;

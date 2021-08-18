@@ -4,18 +4,16 @@ import com.netcetera.trema.core.api.IDatabase;
 import com.netcetera.trema.core.api.IDatabaseListener;
 import com.netcetera.trema.core.api.ITextNode;
 import com.netcetera.trema.core.api.IValueNode;
-import org.jdom.Attribute;
-import org.jdom.Comment;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.Namespace;
-import org.jdom.contrib.input.LineNumberElement;
-import org.jdom.contrib.input.LineNumberSAXBuilder;
-import org.jdom.input.JDOMParseException;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
+import org.jdom2.Attribute;
+import org.jdom2.Comment;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.Namespace;
+import org.jdom2.input.JDOMParseException;
+import org.jdom2.input.SAXBuilder;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXParseException;
@@ -129,7 +127,7 @@ public class XMLDatabase implements IDatabase {
    * @return a <code>SAXBuilder</code> to build a JDOM tree using SAX.
    */
   private SAXBuilder getSAXBuilder() {
-    final LineNumberSAXBuilder builder = new LineNumberSAXBuilder();
+    final SAXBuilder builder = new SAXBuilder();
 
     // this parser configuration will use an xsd schema for validation
     // if one is specified in the xml itself and if that xsd can be found
@@ -204,18 +202,11 @@ public class XMLDatabase implements IDatabase {
       }
 
       // store additional namespaces. the xsi namespace is used for the attribute xsi:noSchemaNamespaceLocation
-      for (Object namespace : rootElement.getAdditionalNamespaces()) {
-        // The list is not type save, therefore a cast is done
-        if (namespace instanceof Namespace) {
-          additionalNamespaces.add((Namespace) namespace);
-        } else {
-          throw new RuntimeException("Namespace List contains Objects that are not of type Namespace");
-        }
-      }
+      additionalNamespaces.addAll(rootElement.getAdditionalNamespaces());
 
       if (masterLanguage == null) {
         // since we cannot determine the line numbers in this methods
-        // we pass 0 to occuring ParseExceptions
+        // we pass 0 to occurring ParseExceptions
         throw new ParseException("Master language missing.", 0);
       }
 
@@ -227,21 +218,18 @@ public class XMLDatabase implements IDatabase {
       for (Element textElement : textList) {
         String key = textElement.getAttributeValue(KEY_ATTRIBUTE_NAME);
         if (key == null) {
-          throw new ParseException("No key found for text.",
-              ((LineNumberElement) textElement).getStartLine());
+          throw new ParseException("No key found for text.");
         }
 
         if (keyMap.containsKey(key)) {
-          parseWarnings.add(new ParseWarning("Duplicate key: " + key,
-              ((LineNumberElement) textElement).getStartLine()));
+          parseWarnings.add(new ParseWarning("Duplicate key: " + key, 0));
         } else {
           keyMap.put(key, "");
         }
 
         String context = textElement.getChildText(CONTEXT_ELEMENT_NAME);
         if (context == null) {
-          throw new ParseException("No context found for key \"" + key + "\".",
-              ((LineNumberElement) textElement).getStartLine());
+          throw new ParseException("No context found for key \"" + key + "\".");
         }
 
         ITextNode textNode = new XMLTextNode(key, context);
@@ -251,14 +239,12 @@ public class XMLDatabase implements IDatabase {
         for (Element valueElement : valueList) {
           String language = valueElement.getAttributeValue(LANGUAGE_ATTRIBUTE_NAME);
           if (language == null) {
-            throw new ParseException("No language found for value of key \"" + key + "\".",
-                ((LineNumberElement) valueElement).getStartLine());
+            throw new ParseException("No language found for value of key \"" + key + "\".");
           }
           String statusName = valueElement.getAttributeValue(STATUS_ATTRIBUTE_NAME);
           Status status = Status.valueOf(statusName);
           if (status == null) {
-            throw new ParseException("Invalid status for key \"" + key + "\": " + statusName,
-                ((LineNumberElement) valueElement).getStartLine());
+            throw new ParseException("Invalid status for key \"" + key + "\": " + statusName);
           }
           String value = valueElement.getText();
           textNode.addValueNode(new XMLValueNode(language, status, value));
@@ -291,6 +277,7 @@ public class XMLDatabase implements IDatabase {
 
   /**
    * Writes XML code to a given <code>StringWriter</code>.
+   *
    * @param stringWriter the string writer to write to
    * @param encoding the encoding to be used
    * @param indent the indent string to be used
@@ -309,8 +296,8 @@ public class XMLDatabase implements IDatabase {
   }
 
   /**
-   * Creates a <code>Document</code> object for the current state of
-   * this xml database.
+   * Creates a <code>Document</code> object for the current state of this xml database.
+   *
    * @return a <code>Document</code> object.
    */
   private Document getDocument() {
@@ -360,7 +347,7 @@ public class XMLDatabase implements IDatabase {
    * @return true if there are parse warnings.
    */
   public boolean hasParseWarnings() {
-    return parseWarnings.size() > 0;
+    return !parseWarnings.isEmpty();
   }
 
   /**
@@ -368,11 +355,12 @@ public class XMLDatabase implements IDatabase {
    * @return the parse warnings or an empty array if there are none.
    */
   public ParseWarning[] getParseWarnings() {
-    return parseWarnings.toArray(new ParseWarning[parseWarnings.size()]);
+    return parseWarnings.toArray(new ParseWarning[0]);
   }
 
   /**
    * Gets the text node for a given key.
+   *
    * @param key the key of the text node to get
    * @return the text node for the given key or <code>null</code> if
    * no text node exists for the given key.
