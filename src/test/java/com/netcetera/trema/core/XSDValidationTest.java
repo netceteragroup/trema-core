@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class XSDValidationTest {
 
   private static final String XSD_LOCATION = "xsi:noNamespaceSchemaLocation="
-    + "\"http://software.group.nca/trema/schema/trema-1.0.xsd\"";
+    + "\"https://software.group.nca/trema/schema/trema-1.0.xsd\"";
   private static final String SCHEMA_NAMESPACE = "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"";
 
 
