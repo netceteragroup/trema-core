@@ -74,8 +74,8 @@
     <hamcrest.version>2.2</hamcrest.version>
     <jdom.version>2.0.6.1</jdom.version>
     <junit.version>5.8.2</junit.version>
-    <log4j.version>2.17.0</log4j.version>
-    <mockito.version>4.1.0</mockito.version>
+    <log4j.version>2.17.1</log4j.version>
+    <mockito.version>4.2.0</mockito.version>
     <poi.version>3.17</poi.version>
     <xerces.version>2.12.1</xerces.version>
 
