@@ -77,7 +77,7 @@
     <log4j.version>2.17.1</log4j.version>
     <mockito.version>4.2.0</mockito.version>
     <poi.version>3.17</poi.version>
-    <xerces.version>2.12.1</xerces.version>
+    <xerces.version>2.12.2</xerces.version>
 
     <!-- Plugins -->
     <coveralls-maven-plugin.version>4.3.0</coveralls-maven-plugin.version>
